@@ -6,7 +6,7 @@ export default function AddBookmarkPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="signal-enter mb-8" style={{ ['--i' as string]: 0 }}>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-fg">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
           Add bookmark
         </h1>
         <p className="mt-2 text-sm text-muted">

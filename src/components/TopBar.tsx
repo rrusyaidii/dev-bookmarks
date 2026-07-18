@@ -35,11 +35,12 @@ export default function TopBar({
   }, [router]);
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-bg px-3 md:px-5">
+    <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-bg px-2 sm:gap-3 sm:px-3 md:px-5">
       <button
+        type="button"
         onClick={onMenuToggle}
-        className="flex size-11 cursor-pointer items-center justify-center text-muted transition-colors hover:text-fg md:hidden"
-        aria-label="Toggle sidebar"
+        className="flex size-11 shrink-0 cursor-pointer items-center justify-center text-muted transition-colors hover:text-fg md:hidden"
+        aria-label="Open menu"
       >
         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
           <line x1="3" y1="5" x2="17" y2="5" />
@@ -48,7 +49,7 @@ export default function TopBar({
         </svg>
       </button>
 
-      <form onSubmit={handleSearch} className="relative mx-auto w-full max-w-sm">
+      <form onSubmit={handleSearch} className="relative min-w-0 flex-1 md:mx-auto md:max-w-sm">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
           width="14"
@@ -64,7 +65,7 @@ export default function TopBar({
           <path d="m21 21-4.35-4.35" />
         </svg>
         <input
-          type="text"
+          type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search…"
@@ -72,11 +73,11 @@ export default function TopBar({
         />
       </form>
 
-      <ModeToggle />
+      <ModeToggle className="shrink-0" />
 
-      <div className="hidden items-center gap-4 sm:flex">
+      <div className="hidden shrink-0 items-center gap-3 sm:flex">
         {userEmail && (
-          <span className="max-w-[180px] truncate font-mono text-[11px] text-muted" title={userEmail}>
+          <span className="hidden max-w-[140px] truncate font-mono text-[11px] text-muted lg:inline" title={userEmail}>
             {userEmail}
           </span>
         )}

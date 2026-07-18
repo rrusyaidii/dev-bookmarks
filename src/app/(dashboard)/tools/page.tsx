@@ -24,7 +24,7 @@ export default function ToolsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-10">
       <div className="signal-enter" style={{ ['--i' as string]: 0 }}>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-fg">Tools</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">Tools</h1>
         <p className="mt-2 text-sm text-muted">
           Backup, restore, retag, and check link health.
         </p>

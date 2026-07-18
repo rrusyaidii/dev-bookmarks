@@ -82,7 +82,7 @@ function BookmarksPageInner() {
     <div className="mx-auto max-w-3xl space-y-8 xl:max-w-5xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="forge-enter" style={{ ['--i' as string]: 0 }}>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-fg">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
             Bookmarks
           </h1>
           <p className="mt-2 font-mono text-xs tabular-nums text-muted">{countLabel}</p>

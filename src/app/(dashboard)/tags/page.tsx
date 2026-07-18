@@ -29,7 +29,7 @@ export default function TagsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="signal-enter" style={{ ['--i' as string]: 0 }}>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-fg">Tags</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">Tags</h1>
         <p className="mt-2 font-mono text-xs text-muted">
           {loading ? 'Loading…' : `${tags.length} in your collection`}
         </p>

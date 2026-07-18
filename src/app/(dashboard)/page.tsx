@@ -54,7 +54,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-4xl space-y-6">
-        <h1 className="font-display text-4xl font-bold text-fg">Dashboard</h1>
+        <h1 className="font-display text-3xl font-bold text-fg sm:text-4xl">Dashboard</h1>
         <p className="text-sm text-red">{error}</p>
         <p className="text-sm text-muted">Could not load bookmarks.</p>
       </div>
@@ -86,7 +86,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-10">
       <div className="signal-enter" style={{ ['--i' as string]: 0 }}>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-fg">
+        <h1 className="font-display text-3xl font-bold tracking-tight text-fg sm:text-4xl">
           Dashboard
         </h1>
         <p className="mt-2 text-sm text-muted">Your signal shelf at a glance.</p>

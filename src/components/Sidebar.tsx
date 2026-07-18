@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import AppearanceControls from '@/components/AppearanceControls';
+import { createClient } from '@/lib/supabase/client';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: DashboardIcon },
@@ -17,13 +19,29 @@ export default function Sidebar({
   onClose,
   collapsed,
   onToggleCollapse,
+  userEmail,
 }: {
   open: boolean;
   onClose: () => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  userEmail?: string | null;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  // Desktop can collapse; mobile drawer stays full-width.
+  const slim = collapsed;
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    onClose();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <>
@@ -31,32 +49,32 @@ export default function Sidebar({
         <div
           className="fixed inset-0 z-30 bg-bg/80 md:hidden"
           onClick={onClose}
+          aria-hidden
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col border-r border-border bg-surface transition-[width,transform] duration-200 ${
-          collapsed ? 'w-16' : 'w-56'
+        className={`fixed inset-y-0 left-0 z-40 flex w-56 flex-col border-r border-border bg-surface transition-[width,transform] duration-200 ${
+          slim ? 'md:w-16' : 'md:w-56'
         } ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
-        <div className={`border-b border-border px-4 py-5 ${collapsed ? 'px-3' : ''}`}>
+        <div className={`border-b border-border px-4 py-5 ${slim ? 'md:px-3' : ''}`}>
           <Link href="/" onClick={onClose} className="block">
-            {!collapsed ? (
-              <>
-                <span className="font-display text-2xl font-bold tracking-tight text-fg">
-                  DevMark
-                </span>
-                <span className="signal-rule mt-2 block h-0.5 w-11 rounded-full bg-accent" aria-hidden />
-              </>
-            ) : (
-              <span className="font-display text-xl font-bold text-accent" title="DevMark">
+            <span className={slim ? 'md:hidden' : undefined}>
+              <span className="font-display text-2xl font-bold tracking-tight text-fg">
+                DevMark
+              </span>
+              <span className="signal-rule mt-2 block h-0.5 w-11 rounded-full bg-accent" aria-hidden />
+            </span>
+            {slim && (
+              <span className="hidden font-display text-xl font-bold text-accent md:inline" title="DevMark">
                 D
               </span>
             )}
           </Link>
         </div>
 
-        <nav className="flex-1 space-y-1 px-2 py-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === '/'
@@ -71,8 +89,8 @@ export default function Sidebar({
                   isActive
                     ? 'bg-surface-hover text-accent'
                     : 'text-muted hover:bg-surface-hover hover:text-fg'
-                } ${collapsed ? 'justify-center px-0' : ''}`}
-                title={collapsed ? item.label : undefined}
+                } ${slim ? 'md:justify-center md:px-0' : ''}`}
+                title={slim ? item.label : undefined}
               >
                 {isActive && (
                   <span
@@ -81,21 +99,44 @@ export default function Sidebar({
                   />
                 )}
                 <item.icon />
-                {!collapsed && <span className="font-medium">{item.label}</span>}
+                <span className={`font-medium ${slim ? 'md:hidden' : ''}`}>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <AppearanceControls collapsed={collapsed} />
+        <AppearanceControls collapsed={slim} />
 
-        <div
-          className={`border-t border-border p-3 ${collapsed ? 'flex justify-center' : 'flex items-center gap-2'}`}
-        >
+        <div className="space-y-1 border-t border-border p-3">
+          {userEmail && (
+            <p
+              className={`truncate px-1 font-mono text-[10px] text-muted ${slim ? 'md:hidden' : ''}`}
+              title={userEmail}
+            >
+              {userEmail}
+            </p>
+          )}
           <button
+            type="button"
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className={`flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-[10px] px-2 font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:bg-surface-hover hover:text-accent disabled:opacity-50 ${
+              slim ? 'md:justify-center md:px-0' : ''
+            }`}
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <SignOutIcon />
+            <span className={slim ? 'md:hidden' : undefined}>
+              {signingOut ? '…' : 'Sign out'}
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={onToggleCollapse}
-            className="flex size-11 cursor-pointer items-center justify-center text-muted transition-colors hover:text-fg"
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="hidden min-h-11 w-full cursor-pointer items-center gap-2 px-2 text-muted transition-colors hover:text-fg md:flex"
+            aria-label={slim ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg
               width="14"
@@ -106,15 +147,25 @@ export default function Sidebar({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className={`transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
+              className={`transition-transform duration-200 ${slim ? 'rotate-180' : ''}`}
             >
               <path d="M15 18l-6-6 6-6" />
             </svg>
+            {!slim && <span className="font-mono text-[11px]">Collapse</span>}
           </button>
-          {!collapsed && <span className="font-mono text-[11px] text-muted">Collapse</span>}
         </div>
       </aside>
     </>
+  );
+}
+
+function SignOutIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
   );
 }
 

@@ -23,10 +23,24 @@ export function ModeToggle({ className = '' }: { className?: string }) {
 export default function AppearanceControls({ collapsed }: { collapsed: boolean }) {
   const { appearance, setTheme } = useAppearance();
 
+  // Slim desktop rail: mode toggle only (themes need labels/space).
   if (collapsed) {
     return (
-      <div className="flex justify-center border-t border-border py-2">
-        <ModeToggle />
+      <div className="border-t border-border py-2">
+        <div className="flex justify-center gap-2 px-2 md:hidden">
+          {THEMES.map((id) => (
+            <ThemeSwatch
+              key={id}
+              id={id}
+              active={appearance.theme === id}
+              mode={appearance.mode}
+              onSelect={setTheme}
+            />
+          ))}
+        </div>
+        <div className="hidden justify-center md:flex">
+          <ModeToggle />
+        </div>
       </div>
     );
   }
@@ -37,9 +51,10 @@ export default function AppearanceControls({ collapsed }: { collapsed: boolean }
         <span className="font-mono text-[11px] uppercase tracking-wider text-muted">
           Appearance
         </span>
-        <ModeToggle className="size-9" />
+        {/* TopBar already has mode on phone */}
+        <ModeToggle className="hidden size-9 md:flex" />
       </div>
-      <div className="flex items-center gap-2" role="listbox" aria-label="Theme">
+      <div className="flex flex-wrap items-center gap-2" role="listbox" aria-label="Theme">
         {THEMES.map((id) => (
           <ThemeSwatch
             key={id}

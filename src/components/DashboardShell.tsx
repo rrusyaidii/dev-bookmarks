@@ -24,14 +24,17 @@ export default function DashboardShell({
         onClose={() => setMobileOpen(false)}
         collapsed={collapsed}
         onToggleCollapse={toggleCollapse}
+        userEmail={userEmail}
       />
       <div
-        className={`flex flex-1 flex-col transition-[margin] duration-200 ${
+        className={`flex min-w-0 flex-1 flex-col transition-[margin] duration-200 ${
           collapsed ? 'md:ml-16' : 'md:ml-56'
         }`}
       >
         <TopBar onMenuToggle={toggleMobile} userEmail={userEmail} />
-        <main className="flex-1 px-4 py-8 md:px-8 md:py-10 lg:px-10">{children}</main>
+        <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-10 lg:px-10">
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -236,7 +236,7 @@ function ActionCluster({
   onDelete,
 }: { bookmark: Bookmark } & RowActions) {
   return (
-    <div className="flex shrink-0 items-center opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+    <div className="flex shrink-0 flex-wrap items-center opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
       <IconBtn
         title={bookmark.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         onClick={() => onFavorite(bookmark)}
@@ -307,7 +307,7 @@ function ListItem({
 
   return (
     <li
-      className="forge-row forge-enter group flex items-start gap-3 px-2 py-3"
+      className="forge-row forge-enter group flex items-start gap-3 px-1 py-3 sm:px-2"
       style={{ ['--i' as string]: Math.min(index, 12) }}
     >
       <img
@@ -319,12 +319,12 @@ function ListItem({
         }}
       />
       <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-2">
           <a
             href={bookmark.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="min-w-0 truncate font-display text-base font-bold tracking-tight text-fg transition-colors hover:text-accent"
+            className="min-w-0 font-display text-base font-bold tracking-tight text-fg transition-colors hover:text-accent sm:truncate"
           >
             {bookmark.isFavorite && (
               <span className="mr-1.5 text-accent" title="Favorite">
@@ -382,7 +382,7 @@ function CardItem({
       className="signal-enter shelf-card group flex flex-col p-4"
       style={{ ['--i' as string]: Math.min(index, 12) }}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex flex-col gap-2">
         <div className="flex min-w-0 items-start gap-2.5">
           <img
             src={bookmark.favicon}
@@ -392,7 +392,7 @@ function CardItem({
               (e.target as HTMLImageElement).src = faviconFallback(20);
             }}
           />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <a
               href={bookmark.url}
               target="_blank"
