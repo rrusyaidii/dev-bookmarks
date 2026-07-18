@@ -8,7 +8,7 @@ export type AuthUser = Pick<User, 'id' | 'email'>;
 export { isAllowedEmail };
 
 /**
- * Resolve the current user from cookie session (web) or Bearer token (extension).
+ * Resolve the current user from cookie session (web) or Bearer token.
  * Rejects users not in ALLOWED_EMAIL when that env is set.
  */
 export async function getAuthUser(request?: NextRequest): Promise<AuthUser | null> {

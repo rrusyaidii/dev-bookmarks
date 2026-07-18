@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Tag } from '@/types';
-import { getTagColor } from '@/lib/tag-colors';
+import { formatTagLabel, getTagColor } from '@/lib/tag-colors';
 
 export default function TagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -63,7 +63,7 @@ export default function TagsPage() {
                   className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
                   style={{ backgroundColor: `${color}20`, color }}
                 >
-                  {tag.name}
+                  {formatTagLabel(tag.name)}
                 </span>
                 <p className="mt-3 text-2xl font-bold text-fg">{tag.count}</p>
                 <p className="text-xs text-muted">

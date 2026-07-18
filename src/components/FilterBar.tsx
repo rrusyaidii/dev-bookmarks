@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Tag } from '@/types';
+import { formatTagLabel } from '@/lib/tag-colors';
 
 export default function FilterBar({
   active,
@@ -43,7 +44,7 @@ export default function FilterBar({
                   : 'text-muted hover:bg-surface-hover hover:text-fg'
               }`}
             >
-              {id === 'all' ? 'All' : tag.name}
+              {id === 'all' ? 'All' : formatTagLabel(tag.name)}
               {id !== 'all' && (
                 <span className="ml-1.5 text-xs opacity-60">{tag.count}</span>
               )}

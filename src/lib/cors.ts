@@ -8,7 +8,6 @@ const ALLOWED_ORIGINS = [
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
-  if (origin.startsWith('chrome-extension://')) return true;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (appUrl) {

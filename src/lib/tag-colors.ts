@@ -21,6 +21,45 @@ const COLORS: Record<string, string> = {
   tooling: '#94a3b8',
 };
 
+const LABELS: Record<string, string> = {
+  ai: 'AI',
+  api: 'API',
+  css: 'CSS',
+  nextjs: 'Next.js',
+  typescript: 'TypeScript',
+  javascript: 'JavaScript',
+  react: 'React',
+  tailwind: 'Tailwind',
+  node: 'Node',
+  docker: 'Docker',
+  python: 'Python',
+  database: 'Database',
+  devops: 'DevOps',
+  testing: 'Testing',
+  design: 'Design',
+  performance: 'Performance',
+  security: 'Security',
+  frontend: 'Frontend',
+  backend: 'Backend',
+  tooling: 'Tooling',
+  graphql: 'GraphQL',
+  aws: 'AWS',
+  linux: 'Linux',
+  git: 'Git',
+  go: 'Go',
+  rust: 'Rust',
+  mobile: 'Mobile',
+  other: 'Other',
+};
+
 export function getTagColor(tag: string): string {
   return COLORS[tag.toLowerCase()] || '#8b8fa3';
+}
+
+/** Display label for tags (AI, Next.js, TypeScript, …). */
+export function formatTagLabel(tag: string): string {
+  const key = tag.toLowerCase();
+  if (LABELS[key]) return LABELS[key];
+  if (!tag) return tag;
+  return tag.charAt(0).toUpperCase() + tag.slice(1);
 }

@@ -4,7 +4,7 @@ import { Bookmark } from '@/types';
 import { useEffect, useState, useCallback } from 'react';
 import CopyLinkIcon from './CopyLinkIcon';
 import EditBookmarkModal from './EditBookmarkModal';
-import { getTagColor } from '@/lib/tag-colors';
+import { formatTagLabel, getTagColor } from '@/lib/tag-colors';
 
 function SkeletonGrid() {
   return (
@@ -209,6 +209,7 @@ export default function BookmarkGrid({
                     bookmark.isFavorite ? 'text-yellow' : 'text-muted hover:text-yellow'
                   }`}
                   aria-label="Toggle favorite"
+                  title={bookmark.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={bookmark.isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -218,6 +219,7 @@ export default function BookmarkGrid({
                   onClick={() => setEditing(bookmark)}
                   className="rounded-lg p-1.5 text-muted transition-all hover:bg-surface-hover hover:text-accent"
                   aria-label="Edit bookmark"
+                  title="Edit bookmark"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 20h9" />
@@ -228,6 +230,7 @@ export default function BookmarkGrid({
                   onClick={() => handleCopy(bookmark)}
                   className="rounded-lg p-1.5 text-muted transition-all hover:bg-surface-hover hover:text-accent"
                   aria-label="Copy link"
+                  title={copiedId === bookmark.id ? 'Copied!' : 'Copy link'}
                 >
                   {copiedId === bookmark.id ? (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green">
@@ -242,7 +245,7 @@ export default function BookmarkGrid({
                   disabled={checkingId === bookmark.id}
                   className="rounded-lg p-1.5 text-muted transition-all hover:bg-surface-hover hover:text-accent disabled:opacity-50"
                   aria-label="Check link"
-                  title="Check link health"
+                  title={checkingId === bookmark.id ? 'Checking…' : 'Check link health'}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
@@ -254,6 +257,7 @@ export default function BookmarkGrid({
                   disabled={deletingId === bookmark.id}
                   className="rounded-lg p-1.5 text-muted transition-all hover:bg-surface-hover hover:text-red disabled:opacity-50"
                   aria-label="Delete bookmark"
+                  title="Delete bookmark"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M3 6h18" />
@@ -284,7 +288,7 @@ export default function BookmarkGrid({
                     color: getTagColor(tag),
                   }}
                 >
-                  {tag}
+                  {formatTagLabel(tag)}
                 </span>
               ))}
               <LinkStatusBadge status={bookmark.linkStatus} />
