@@ -18,7 +18,7 @@ export default function DashboardShell({
   const toggleCollapse = useCallback(() => setCollapsed((v) => !v), []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-bg">
       <Sidebar
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
@@ -26,12 +26,12 @@ export default function DashboardShell({
         onToggleCollapse={toggleCollapse}
       />
       <div
-        className={`flex flex-1 flex-col transition-all duration-300 ${
-          collapsed ? 'md:ml-16' : 'md:ml-60'
+        className={`flex flex-1 flex-col transition-[margin] duration-200 ${
+          collapsed ? 'md:ml-16' : 'md:ml-56'
         }`}
       >
         <TopBar onMenuToggle={toggleMobile} userEmail={userEmail} />
-        <main className="flex-1 px-4 py-6 md:px-6">{children}</main>
+        <main className="flex-1 px-4 py-8 md:px-8 md:py-10">{children}</main>
       </div>
     </div>
   );

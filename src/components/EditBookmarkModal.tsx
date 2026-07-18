@@ -91,21 +91,21 @@ export default function EditBookmarkModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-fg">Edit bookmark</h2>
+      <div className="absolute inset-0 bg-bg/85" onClick={onClose} />
+      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto border border-border bg-surface p-6 sm:p-8">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <h2 className="font-display text-xl font-medium text-fg">Edit bookmark</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted hover:bg-surface-hover hover:text-fg"
+            className="flex size-10 cursor-pointer items-center justify-center text-muted transition-colors hover:text-fg"
             aria-label="Close"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-5">
           <BookmarkFormFields
             values={values}
             onChange={patch}
@@ -115,18 +115,14 @@ export default function EditBookmarkModal({
           {error && <p className="text-sm text-red">{error}</p>}
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
-            <button
-              type="submit"
-              disabled={saving || retagging}
-              className="h-10 rounded-xl bg-accent/15 px-5 text-sm font-semibold text-accent hover:bg-accent/25 disabled:opacity-50"
-            >
+            <button type="submit" disabled={saving || retagging} className="btn-primary">
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
               type="button"
               onClick={handleRetag}
               disabled={saving || retagging}
-              className="h-10 rounded-xl border border-border px-5 text-sm font-medium text-muted hover:bg-surface-hover hover:text-fg disabled:opacity-50"
+              className="btn-ghost"
             >
               {retagging ? 'Retagging…' : 'Retag with AI'}
             </button>
@@ -134,7 +130,7 @@ export default function EditBookmarkModal({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="h-10 rounded-xl px-5 text-sm text-muted hover:text-fg"
+              className="min-h-11 cursor-pointer px-4 text-sm text-muted transition-colors hover:text-fg disabled:opacity-50"
             >
               Cancel
             </button>

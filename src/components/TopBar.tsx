@@ -34,28 +34,28 @@ export default function TopBar({
   }, [router]);
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-bg/80 px-3 backdrop-blur-xl md:px-4">
+    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-bg px-3 md:px-5">
       <button
         onClick={onMenuToggle}
-        className="flex size-9 items-center justify-center rounded-xl text-muted hover:bg-surface-hover hover:text-fg transition-colors md:hidden"
+        className="flex size-11 cursor-pointer items-center justify-center text-muted transition-colors hover:text-fg md:hidden"
         aria-label="Toggle sidebar"
       >
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
           <line x1="3" y1="5" x2="17" y2="5" />
           <line x1="3" y1="10" x2="17" y2="10" />
           <line x1="3" y1="15" x2="17" y2="15" />
         </svg>
       </button>
 
-      <form onSubmit={handleSearch} className="relative mx-auto w-full max-w-md">
+      <form onSubmit={handleSearch} className="relative mx-auto w-full max-w-sm">
         <svg
-          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
-          width="16"
-          height="16"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          width="14"
+          height="14"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -66,14 +66,14 @@ export default function TopBar({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search bookmarks..."
-          className="h-10 w-full rounded-xl border border-border bg-surface pl-10 pr-4 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 focus:bg-surface-hover"
+          placeholder="Search…"
+          className="h-10 w-full border border-border bg-surface pl-9 pr-3 font-mono text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent"
         />
       </form>
 
-      <div className="hidden items-center gap-2 sm:flex">
+      <div className="hidden items-center gap-4 sm:flex">
         {userEmail && (
-          <span className="max-w-[160px] truncate text-xs text-muted" title={userEmail}>
+          <span className="max-w-[180px] truncate font-mono text-[11px] text-muted" title={userEmail}>
             {userEmail}
           </span>
         )}
@@ -81,7 +81,7 @@ export default function TopBar({
           type="button"
           onClick={handleSignOut}
           disabled={signingOut}
-          className="h-9 rounded-xl border border-border px-3 text-xs font-medium text-muted hover:bg-surface-hover hover:text-fg disabled:opacity-50"
+          className="min-h-11 cursor-pointer px-1 font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:text-accent disabled:opacity-50"
         >
           {signingOut ? '…' : 'Sign out'}
         </button>

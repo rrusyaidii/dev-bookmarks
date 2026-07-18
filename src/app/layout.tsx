@@ -1,9 +1,31 @@
 import type { Metadata } from "next";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 
+const plexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-sans",
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "DevMark — Dev Bookmarks Dashboard",
-  description: "Save, organize, and browse your dev resources effortlessly.",
+  title: "DevMark — Personal bookmark forge",
+  description: "Save, tag, and browse your developer resources.",
 };
 
 export default function RootLayout({
@@ -12,10 +34,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full bg-bg text-fg font-sans">
-        {children}
-      </body>
+    <html
+      lang="en"
+      className={`h-full antialiased ${plexSans.variable} ${plexMono.variable} ${newsreader.variable}`}
+    >
+      <body className="min-h-full bg-bg text-fg font-sans">{children}</body>
     </html>
   );
 }

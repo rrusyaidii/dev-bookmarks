@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { PRESET_TAGS } from '@/data/mock';
+import { formatTagLabel } from '@/lib/tag-colors';
 
 export interface BookmarkFormValues {
   url: string;
@@ -69,10 +70,10 @@ export default function BookmarkFormFields({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {showUrl && (
         <div>
-          <label htmlFor="bf-url" className="mb-1.5 block text-sm font-medium text-fg">
+          <label htmlFor="bf-url" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
             URL
           </label>
           <input
@@ -83,14 +84,14 @@ export default function BookmarkFormFields({
             onBlur={onUrlBlur}
             required
             disabled={disabled}
-            className="h-10 w-full rounded-xl border border-border bg-surface px-3.5 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 disabled:opacity-50"
+            className="input-field h-11 font-mono text-xs"
           />
           {urlHint}
         </div>
       )}
 
       <div>
-        <label htmlFor="bf-title" className="mb-1.5 block text-sm font-medium text-fg">
+        <label htmlFor="bf-title" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
           Title
         </label>
         <input
@@ -99,12 +100,12 @@ export default function BookmarkFormFields({
           value={values.title}
           onChange={(e) => onChange({ title: e.target.value })}
           disabled={disabled}
-          className="h-10 w-full rounded-xl border border-border bg-surface px-3.5 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 disabled:opacity-50"
+          className="input-field h-11"
         />
       </div>
 
       <div>
-        <label htmlFor="bf-desc" className="mb-1.5 block text-sm font-medium text-fg">
+        <label htmlFor="bf-desc" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
           Description
         </label>
         <textarea
@@ -113,27 +114,26 @@ export default function BookmarkFormFields({
           onChange={(e) => onChange({ description: e.target.value })}
           rows={3}
           disabled={disabled}
-          className="w-full resize-none rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 disabled:opacity-50"
+          className="input-field resize-none"
         />
       </div>
 
       <div className="relative">
-        <label htmlFor="bf-tags" className="mb-1.5 block text-sm font-medium text-fg">
+        <label htmlFor="bf-tags" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
           Tags
         </label>
-        <div className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 focus-within:border-accent/40">
+        <div className="flex min-h-11 flex-wrap items-center gap-1.5 border border-border bg-bg px-3 py-1.5 focus-within:border-accent">
           {values.tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium"
-              style={{ backgroundColor: '#61dafb20', color: '#61dafb' }}
+              className="inline-flex items-center gap-1 border border-border px-2 py-0.5 font-mono text-[11px] text-accent"
             >
-              {tag}
+              {formatTagLabel(tag)}
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
                 disabled={disabled}
-                className="hover:text-fg transition-colors"
+                className="text-muted transition-colors hover:text-fg"
               >
                 ×
               </button>
@@ -160,7 +160,7 @@ export default function BookmarkFormFields({
           />
         </div>
         {showSuggestions && (
-          <div className="absolute z-10 mt-1 w-full rounded-xl border border-border bg-surface py-1 shadow-xl">
+          <div className="absolute z-10 mt-1 w-full border border-border bg-surface py-1">
             {tagSuggestions.map((tag) => (
               <button
                 key={tag}
@@ -169,9 +169,9 @@ export default function BookmarkFormFields({
                   e.preventDefault();
                   addTag(tag);
                 }}
-                className="w-full px-3.5 py-2 text-left text-sm text-muted hover:bg-surface-hover hover:text-fg"
+                className="w-full px-3.5 py-2.5 text-left text-sm text-muted transition-colors hover:bg-surface-hover hover:text-fg"
               >
-                {tag}
+                {formatTagLabel(tag)}
               </button>
             ))}
           </div>
@@ -179,7 +179,7 @@ export default function BookmarkFormFields({
       </div>
 
       <div>
-        <label htmlFor="bf-notes" className="mb-1.5 block text-sm font-medium text-fg">
+        <label htmlFor="bf-notes" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
           Notes
         </label>
         <textarea
@@ -189,7 +189,7 @@ export default function BookmarkFormFields({
           rows={2}
           placeholder="Personal notes (optional)"
           disabled={disabled}
-          className="w-full resize-none rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 disabled:opacity-50"
+          className="input-field resize-none"
         />
       </div>
     </div>

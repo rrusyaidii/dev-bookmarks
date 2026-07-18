@@ -25,10 +25,10 @@ export default function FilterBar({
   const items = [{ name: 'all', count: 0 }, ...tags];
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <div className="flex items-center gap-1 overflow-x-auto border-b border-border pb-px scrollbar-none">
       {loading && tags.length === 0 ? (
         Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="skeleton h-8 w-16 shrink-0 rounded-lg" />
+          <div key={i} className="skeleton h-9 w-16 shrink-0" />
         ))
       ) : (
         items.map((tag) => {
@@ -38,15 +38,15 @@ export default function FilterBar({
             <button
               key={id}
               onClick={() => onChange(id)}
-              className={`whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium transition-all duration-200 ${
+              className={`min-h-10 shrink-0 cursor-pointer border-b-2 px-3 py-2 font-mono text-xs transition-colors duration-200 ${
                 isActive
-                  ? 'bg-accent/15 text-accent'
-                  : 'text-muted hover:bg-surface-hover hover:text-fg'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-muted hover:text-fg'
               }`}
             >
               {id === 'all' ? 'All' : formatTagLabel(tag.name)}
               {id !== 'all' && (
-                <span className="ml-1.5 text-xs opacity-60">{tag.count}</span>
+                <span className="ml-1.5 opacity-50">{tag.count}</span>
               )}
             </button>
           );

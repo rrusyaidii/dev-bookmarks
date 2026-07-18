@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Tag } from '@/types';
-import { formatTagLabel, getTagColor } from '@/lib/tag-colors';
+import { formatTagLabel } from '@/lib/tag-colors';
 
 export default function TagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -27,52 +27,47 @@ export default function TagsPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-fg">Tags</h1>
-        <p className="mt-1 text-sm text-muted">
-          {loading ? 'Loading…' : `${tags.length} tags across your collection`}
+        <h1 className="font-display text-3xl font-medium tracking-tight text-fg">Tags</h1>
+        <p className="mt-2 font-mono text-xs text-muted">
+          {loading ? 'Loading…' : `${tags.length} in your collection`}
         </p>
       </div>
 
-      {error && (
-        <p className="text-sm text-red">{error}</p>
-      )}
+      {error && <p className="text-sm text-red">{error}</p>}
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="skeleton h-20 rounded-xl" />
+        <div className="divide-y divide-border border border-border">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between px-4 py-4">
+              <div className="skeleton h-4 w-28" />
+              <div className="skeleton h-4 w-8" />
+            </div>
           ))}
         </div>
       ) : tags.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border py-16 text-center">
+        <div className="border border-dashed border-border py-16 text-center">
           <p className="text-sm text-muted">No tags yet. Add bookmarks to generate tags.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {tags.map((tag) => {
-            const color = tag.color || getTagColor(tag.name);
-            return (
+        <ul className="divide-y divide-border border border-border">
+          {tags.map((tag) => (
+            <li key={tag.name}>
               <Link
-                key={tag.name}
                 href={`/bookmarks?tag=${encodeURIComponent(tag.name)}`}
-                className="glass rounded-xl p-4 transition-all hover:scale-[1.02] hover:border-border/80"
+                className="flex items-center justify-between gap-4 px-4 py-4 transition-colors hover:bg-surface"
               >
-                <span
-                  className="inline-flex rounded-md px-2 py-0.5 text-xs font-medium"
-                  style={{ backgroundColor: `${color}20`, color }}
-                >
+                <span className="text-sm font-medium text-fg hover:text-accent">
                   {formatTagLabel(tag.name)}
                 </span>
-                <p className="mt-3 text-2xl font-bold text-fg">{tag.count}</p>
-                <p className="text-xs text-muted">
-                  {tag.count === 1 ? 'bookmark' : 'bookmarks'}
-                </p>
+                <span className="font-mono text-xs text-muted">
+                  {tag.count}
+                </span>
               </Link>
-            );
-          })}
-        </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

@@ -43,15 +43,17 @@ function LoginForm() {
   };
 
   return (
-    <div className="glass rounded-2xl p-8 space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-fg">Welcome back</h1>
-        <p className="mt-1 text-sm text-muted">Sign in to DevMark</p>
+    <div className="border border-border bg-surface p-8 sm:p-10">
+      <div className="mb-8">
+        <p className="font-display text-2xl font-medium tracking-tight text-fg">DevMark</p>
+        <div className="mt-2 h-px w-12 bg-accent" />
+        <h1 className="mt-6 font-display text-xl font-medium text-fg">Sign in</h1>
+        <p className="mt-1 text-sm text-muted">Private collection — invite only.</p>
       </div>
 
-      <form onSubmit={handleEmailLogin} className="space-y-4">
+      <form onSubmit={handleEmailLogin} className="space-y-5">
         <div>
-          <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-fg">
+          <label htmlFor="email" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
             Email
           </label>
           <input
@@ -61,11 +63,11 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            className="h-10 w-full rounded-xl border border-border bg-surface px-3.5 text-sm text-fg outline-none focus:border-accent/40 disabled:opacity-50"
+            className="h-11 w-full border border-border bg-bg px-3.5 text-sm text-fg outline-none focus-visible:border-accent disabled:opacity-50"
           />
         </div>
         <div>
-          <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-fg">
+          <label htmlFor="password" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
             Password
           </label>
           <input
@@ -76,29 +78,27 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            className="h-10 w-full rounded-xl border border-border bg-surface px-3.5 text-sm text-fg outline-none focus:border-accent/40 disabled:opacity-50"
+            className="h-11 w-full border border-border bg-bg px-3.5 text-sm text-fg outline-none focus-visible:border-accent disabled:opacity-50"
           />
         </div>
 
         {error && <p className="text-sm text-red">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="h-11 w-full rounded-xl bg-accent/15 text-sm font-semibold text-accent hover:bg-accent/25 disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
-
-      <p className="text-center text-xs text-muted">Private app — invite only.</p>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="glass rounded-2xl p-8 text-sm text-muted">Loading…</div>}>
+    <Suspense
+      fallback={
+        <div className="border border-border bg-surface p-8 text-sm text-muted">Loading…</div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

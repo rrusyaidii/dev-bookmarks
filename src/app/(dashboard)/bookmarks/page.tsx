@@ -71,12 +71,14 @@ function BookmarksPageInner() {
   }, [activeTag, searchQuery, bookmarks, sort]);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mx-auto max-w-3xl space-y-6 xl:max-w-4xl">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-fg">Bookmarks</h1>
-          <p className="mt-1 text-sm text-muted">
-            {loading ? 'Loading...' : `${bookmarks.length} bookmarks collected`}
+          <h1 className="font-display text-3xl font-medium tracking-tight text-fg">
+            Bookmarks
+          </h1>
+          <p className="mt-2 font-mono text-xs text-muted">
+            {loading ? 'Loading…' : `${bookmarks.length} collected`}
           </p>
         </div>
 
@@ -85,7 +87,7 @@ function BookmarksPageInner() {
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             disabled={loading}
-            className="h-9 rounded-lg border border-border bg-surface px-3 text-sm text-fg outline-none focus:border-accent/40 disabled:opacity-50"
+            className="h-10 border border-border bg-bg px-3 font-mono text-xs text-fg outline-none focus-visible:border-accent disabled:opacity-50"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -94,7 +96,7 @@ function BookmarksPageInner() {
             ))}
           </select>
 
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full sm:w-56">
             <svg
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
               width="14"
@@ -102,9 +104,7 @@ function BookmarksPageInner() {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeWidth="1.6"
             >
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.35-4.35" />
@@ -113,9 +113,9 @@ function BookmarksPageInner() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter..."
+              placeholder="Filter…"
               disabled={loading}
-              className="h-9 w-full rounded-lg border border-border bg-surface pl-9 pr-3 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 disabled:opacity-50"
+              className="h-10 w-full border border-border bg-bg pl-9 pr-3 text-sm text-fg placeholder-muted outline-none focus-visible:border-accent disabled:opacity-50"
             />
           </div>
         </div>
@@ -124,9 +124,9 @@ function BookmarksPageInner() {
       <FilterBar active={activeTag} onChange={setActiveTag} />
 
       {error ? (
-        <div className="flex flex-col items-center gap-4 rounded-xl py-24 text-center">
-          <p className="text-red text-sm">{error}</p>
-          <p className="text-muted text-sm">Could not load bookmarks. Make sure the server is running.</p>
+        <div className="border border-dashed border-border py-16 text-center">
+          <p className="text-sm text-red">{error}</p>
+          <p className="mt-2 text-sm text-muted">Could not load bookmarks.</p>
         </div>
       ) : (
         <BookmarkGrid
@@ -148,9 +148,9 @@ export default function BookmarksPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-6xl space-y-6">
+        <div className="mx-auto max-w-3xl space-y-6">
           <div className="skeleton h-8 w-40" />
-          <div className="skeleton h-64 w-full rounded-xl" />
+          <div className="skeleton h-64 w-full" />
         </div>
       }
     >

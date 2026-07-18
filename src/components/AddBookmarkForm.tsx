@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import BookmarkFormFields, { type BookmarkFormValues } from './BookmarkFormFields';
+import { formatTagLabel } from '@/lib/tag-colors';
 
 export default function AddBookmarkForm() {
   const router = useRouter();
@@ -112,7 +113,7 @@ export default function AddBookmarkForm() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-5">
-      <form onSubmit={handleSubmit} className="lg:col-span-3 space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 lg:col-span-3">
         <BookmarkFormFields
           values={values}
           onChange={(p) => {
@@ -124,12 +125,14 @@ export default function AddBookmarkForm() {
           urlHint={
             <>
               {fetchingMeta && (
-                <p className="mt-1.5 text-xs text-muted">Fetching page metadata…</p>
+                <p className="mt-1.5 font-mono text-[11px] text-muted">
+                  Fetching page metadata…
+                </p>
               )}
               {duplicate && (
-                <p className="mt-1.5 text-xs text-yellow">
+                <p className="mt-1.5 text-xs text-accent">
                   Already saved as &quot;{duplicate.title}&quot;.{' '}
-                  <Link href="/bookmarks" className="underline hover:text-accent">
+                  <Link href="/bookmarks" className="underline hover:text-fg">
                     View bookmarks
                   </Link>
                 </p>
@@ -140,32 +143,34 @@ export default function AddBookmarkForm() {
 
         {error && <p className="text-sm text-red">{error}</p>}
 
-        <div className="flex items-center gap-3 pt-2">
+        <div className="flex flex-wrap items-center gap-3 pt-2">
           <button
             type="submit"
             disabled={saving || fetchingMeta || Boolean(duplicate)}
-            className="h-10 rounded-xl bg-accent/15 px-6 text-sm font-semibold text-accent transition-all hover:bg-accent/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-primary"
           >
-            {saving ? 'Saving...' : 'Save Bookmark'}
+            {saving ? 'Saving…' : 'Save bookmark'}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             disabled={saving}
-            className="h-10 rounded-xl border border-border px-6 text-sm font-medium text-muted transition-all hover:bg-surface-hover hover:text-fg disabled:opacity-50"
+            className="btn-ghost"
           >
             Cancel
           </button>
         </div>
-        <p className="text-xs text-muted">
+        <p className="font-mono text-[11px] text-muted">
           Leave tags empty to let AI suggest them on save.
         </p>
       </form>
 
       <div className="lg:col-span-2">
-        <p className="mb-3 text-sm font-medium text-muted">Preview</p>
+        <p className="mb-3 font-mono text-[11px] uppercase tracking-wider text-muted">
+          Preview
+        </p>
         {previewReady ? (
-          <div className="glass rounded-xl p-4 transition-all duration-200">
+          <div className="border border-border bg-surface p-4">
             <div className="flex items-start gap-3">
               <img
                 src={
@@ -173,45 +178,41 @@ export default function AddBookmarkForm() {
                   `https://www.google.com/s2/favicons?domain=${new URL(values.url).hostname}&sz=64`
                 }
                 alt=""
-                className="size-8 shrink-0 rounded-lg bg-surface"
+                className="size-7 shrink-0 border border-border bg-bg"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect fill='%232a2d3a' width='32' height='32' rx='8'/%3E%3C/svg%3E";
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect fill='%231c1917' width='28' height='28'/%3E%3C/svg%3E";
                 }}
               />
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-semibold text-fg">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-fg">
                   {values.title || (fetchingMeta ? 'Loading…' : 'Untitled')}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-muted">
+                <p className="mt-0.5 truncate font-mono text-[11px] text-muted">
                   {values.url.replace(/^https?:\/\//, '').replace(/\/$/, '') || '—'}
                 </p>
               </div>
             </div>
-            <p className="mt-2.5 line-clamp-3 text-xs leading-relaxed text-muted">
+            <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-muted">
               {values.description ||
                 (fetchingMeta ? 'Fetching page metadata…' : 'No description yet.')}
             </p>
             {values.notes && (
-              <p className="mt-2 text-[11px] italic text-muted">Note: {values.notes}</p>
+              <p className="mt-2 font-mono text-[11px] text-muted">Note · {values.notes}</p>
             )}
             {values.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                 {values.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-md px-1.5 py-0.5 text-[11px] font-medium"
-                    style={{ backgroundColor: '#61dafb15', color: '#61dafb' }}
-                  >
-                    {tag}
+                  <span key={tag} className="font-mono text-[11px] text-muted">
+                    {formatTagLabel(tag)}
                   </span>
                 ))}
               </div>
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-            <p className="text-xs text-muted">Enter a URL to see a preview</p>
+          <div className="border border-dashed border-border py-16 text-center">
+            <p className="font-mono text-[11px] text-muted">Enter a URL to see a preview</p>
           </div>
         )}
       </div>
