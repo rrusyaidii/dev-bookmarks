@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, JetBrains_Mono, Syne } from "next/font/google";
+import { AuthRecoveryListener } from "@/components/AuthRecoveryListener";
 import { APPEARANCE_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -45,7 +46,10 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_BOOT_SCRIPT }} />
       </head>
-      <body className="min-h-full bg-bg text-fg font-sans">{children}</body>
+      <body className="min-h-full bg-bg text-fg font-sans">
+        <AuthRecoveryListener />
+        {children}
+      </body>
     </html>
   );
 }

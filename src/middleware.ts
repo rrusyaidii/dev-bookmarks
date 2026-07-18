@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 import { isAllowedEmail } from '@/lib/allowed-email';
 
-const PUBLIC_PATHS = ['/login', '/auth/callback'];
+const PUBLIC_PATHS = ['/login', '/auth/callback', '/reset-password'];
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -53,10 +53,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === '/login') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    return NextResponse.redirect(url);
+  // Stay on reset-password while a recovery session is active.
+  // Do NOT bounce /login → / here: recovery links put tokens in the URL hash,
+  // which the server never sees — a redirect would drop them.
+  if (user && pathname === '/reset-password') {
+    return supabaseResponse;
   }
 
   return supabaseResponse;

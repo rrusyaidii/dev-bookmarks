@@ -50,7 +50,10 @@ Single-user by design: set `ALLOWED_EMAIL` and disable new sign-ups in Supabase.
 3. Set `NEXT_PUBLIC_APP_URL=https://dev-bookmarks-eight.vercel.app`
 4. In Supabase Auth → URL Configuration:
    - Site URL: `https://dev-bookmarks-eight.vercel.app`
-   - Redirect: `https://dev-bookmarks-eight.vercel.app/auth/callback`
+   - Redirect allow list:
+     - `https://dev-bookmarks-eight.vercel.app/auth/callback`
+     - `http://localhost:3000/auth/callback`
+   - Password recovery uses `/auth/callback?next=/reset-password`
 
 ## Scripts
 
