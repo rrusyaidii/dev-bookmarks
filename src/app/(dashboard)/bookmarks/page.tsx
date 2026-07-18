@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Bookmark, SortKey } from '@/types';
 import FilterBar from '@/components/FilterBar';
 import BookmarkGrid from '@/components/BookmarkGrid';
+import ViewToggle from '@/components/ViewToggle';
 import { sortBookmarks } from '@/lib/serialize-bookmark';
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -70,24 +71,30 @@ function BookmarksPageInner() {
     return sortBookmarks(filtered, sort);
   }, [activeTag, searchQuery, bookmarks, sort]);
 
+  const isFiltered = activeTag !== 'all' || Boolean(searchQuery.trim());
+  const countLabel = loading
+    ? 'Loading…'
+    : isFiltered
+      ? `${results.length} of ${bookmarks.length}`
+      : `${bookmarks.length} collected`;
+
   return (
-    <div className="mx-auto max-w-3xl space-y-6 xl:max-w-4xl">
+    <div className="mx-auto max-w-3xl space-y-8 xl:max-w-5xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-medium tracking-tight text-fg">
+        <div className="forge-enter" style={{ ['--i' as string]: 0 }}>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-fg">
             Bookmarks
           </h1>
-          <p className="mt-2 font-mono text-xs text-muted">
-            {loading ? 'Loading…' : `${bookmarks.length} collected`}
-          </p>
+          <p className="mt-2 font-mono text-xs tabular-nums text-muted">{countLabel}</p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <ViewToggle />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             disabled={loading}
-            className="h-10 border border-border bg-bg px-3 font-mono text-xs text-fg outline-none focus-visible:border-accent disabled:opacity-50"
+            className="h-10 rounded-[10px] border border-border bg-bg px-3 font-mono text-xs text-fg outline-none focus-visible:border-accent disabled:opacity-50"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -113,33 +120,35 @@ function BookmarksPageInner() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter…"
+              placeholder="Search…"
               disabled={loading}
-              className="h-10 w-full border border-border bg-bg pl-9 pr-3 text-sm text-fg placeholder-muted outline-none focus-visible:border-accent disabled:opacity-50"
+              className="h-10 w-full rounded-[10px] border border-border bg-bg pl-9 pr-3 text-sm text-fg placeholder-muted outline-none focus-visible:border-accent disabled:opacity-50"
             />
           </div>
         </div>
       </div>
 
-      <FilterBar active={activeTag} onChange={setActiveTag} />
+      <div className="forge-enter space-y-6" style={{ ['--i' as string]: 1 }}>
+        <FilterBar active={activeTag} onChange={setActiveTag} />
 
-      {error ? (
-        <div className="border border-dashed border-border py-16 text-center">
-          <p className="text-sm text-red">{error}</p>
-          <p className="mt-2 text-sm text-muted">Could not load bookmarks.</p>
-        </div>
-      ) : (
-        <BookmarkGrid
-          bookmarks={results}
-          category={activeTag}
-          onDeleted={(id) => setBookmarks((prev) => prev.filter((b) => b.id !== id))}
-          onUpdated={(bookmark) =>
-            setBookmarks((prev) =>
-              prev.map((b) => (b.id === bookmark.id ? bookmark : b))
-            )
-          }
-        />
-      )}
+        {error ? (
+          <div className="border-y border-dashed border-border py-16 text-center">
+            <p className="text-sm text-red">{error}</p>
+            <p className="mt-2 text-sm text-muted">Could not load bookmarks.</p>
+          </div>
+        ) : (
+          <BookmarkGrid
+            bookmarks={results}
+            category={activeTag}
+            onDeleted={(id) => setBookmarks((prev) => prev.filter((b) => b.id !== id))}
+            onUpdated={(bookmark) =>
+              setBookmarks((prev) =>
+                prev.map((b) => (b.id === bookmark.id ? bookmark : b))
+              )
+            }
+          />
+        )}
+      </div>
     </div>
   );
 }

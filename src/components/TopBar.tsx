@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useCallback } from 'react';
+import { ModeToggle } from '@/components/AppearanceControls';
 import { createClient } from '@/lib/supabase/client';
 
 export default function TopBar({
@@ -67,9 +68,11 @@ export default function TopBar({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search…"
-          className="h-10 w-full border border-border bg-surface pl-9 pr-3 font-mono text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent"
+          className="h-10 w-full rounded-[10px] border border-border bg-surface pl-9 pr-3 font-mono text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent"
         />
       </form>
+
+      <ModeToggle />
 
       <div className="hidden items-center gap-4 sm:flex">
         {userEmail && (

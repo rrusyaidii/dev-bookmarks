@@ -1,30 +1,31 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
+import { Figtree, JetBrains_Mono, Syne } from "next/font/google";
+import { APPEARANCE_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
-const plexSans = IBM_Plex_Sans({
+const figtree = Figtree({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-plex-sans",
+  variable: "--font-figtree",
   display: "swap",
 });
 
-const plexMono = IBM_Plex_Mono({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
-  variable: "--font-plex-mono",
+  variable: "--font-jetbrains",
   display: "swap",
 });
 
-const newsreader = Newsreader({
+const syne = Syne({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-newsreader",
+  weight: ["600", "700", "800"],
+  variable: "--font-syne",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "DevMark — Personal bookmark forge",
+  title: "DevMark — Signal shelf for your links",
   description: "Save, tag, and browse your developer resources.",
 };
 
@@ -36,8 +37,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${plexSans.variable} ${plexMono.variable} ${newsreader.variable}`}
+      data-theme="forge"
+      data-mode="dark"
+      className={`h-full antialiased ${figtree.variable} ${jetbrains.variable} ${syne.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_BOOT_SCRIPT }} />
+      </head>
       <body className="min-h-full bg-bg text-fg font-sans">{children}</body>
     </html>
   );

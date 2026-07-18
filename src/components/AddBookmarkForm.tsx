@@ -166,11 +166,11 @@ export default function AddBookmarkForm() {
       </form>
 
       <div className="lg:col-span-2">
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <p className="forge-section-title mb-4 font-mono text-[11px] uppercase tracking-wider text-muted">
           Preview
         </p>
         {previewReady ? (
-          <div className="border border-border bg-surface p-4">
+          <div className="shelf-card p-4">
             <div className="flex items-start gap-3">
               <img
                 src={
@@ -178,10 +178,10 @@ export default function AddBookmarkForm() {
                   `https://www.google.com/s2/favicons?domain=${new URL(values.url).hostname}&sz=64`
                 }
                 alt=""
-                className="size-7 shrink-0 border border-border bg-bg"
+                className="size-7 shrink-0 rounded-md bg-bg"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect fill='%231c1917' width='28' height='28'/%3E%3C/svg%3E";
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Crect fill='%23808080' fill-opacity='0.25' width='28' height='28'/%3E%3C/svg%3E";
                 }}
               />
               <div className="min-w-0 flex-1">
@@ -211,7 +211,7 @@ export default function AddBookmarkForm() {
             )}
           </div>
         ) : (
-          <div className="border border-dashed border-border py-16 text-center">
+          <div className="rounded-[10px] border border-dashed border-border py-16 text-center">
             <p className="font-mono text-[11px] text-muted">Enter a URL to see a preview</p>
           </div>
         )}

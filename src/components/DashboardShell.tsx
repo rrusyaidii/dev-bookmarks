@@ -31,7 +31,7 @@ export default function DashboardShell({
         }`}
       >
         <TopBar onMenuToggle={toggleMobile} userEmail={userEmail} />
-        <main className="flex-1 px-4 py-8 md:px-8 md:py-10">{children}</main>
+        <main className="flex-1 px-4 py-8 md:px-8 md:py-10 lg:px-10">{children}</main>
       </div>
     </div>
   );

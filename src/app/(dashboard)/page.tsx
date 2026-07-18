@@ -30,16 +30,20 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl space-y-10">
+      <div className="mx-auto max-w-4xl space-y-10">
         <div>
-          <div className="skeleton h-8 w-40" />
+          <div className="skeleton h-10 w-48" />
           <div className="skeleton mt-2 h-4 w-56" />
         </div>
-        <div className="grid grid-cols-2 gap-px border border-border bg-border lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-surface px-4 py-5 space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="shelf-card col-span-2 min-h-[140px] p-5">
+            <div className="skeleton h-3 w-16" />
+            <div className="skeleton mt-6 h-14 w-24" />
+          </div>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="shelf-card p-5">
               <div className="skeleton h-3 w-16" />
-              <div className="skeleton h-8 w-12" />
+              <div className="skeleton mt-4 h-10 w-12" />
             </div>
           ))}
         </div>
@@ -49,8 +53,8 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6">
-        <h1 className="font-display text-3xl font-medium text-fg">Dashboard</h1>
+      <div className="mx-auto max-w-4xl space-y-6">
+        <h1 className="font-display text-4xl font-bold text-fg">Dashboard</h1>
         <p className="text-sm text-red">{error}</p>
         <p className="text-sm text-muted">Could not load bookmarks.</p>
       </div>
@@ -59,9 +63,14 @@ export default function DashboardPage() {
 
   const now = new Date();
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const recentBookmarks = bookmarks
-    .filter((b) => new Date(b.createdAt) >= oneWeekAgo)
-    .slice(0, 6);
+  const newestFirst = [...bookmarks].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  const thisWeek = newestFirst.filter((b) => new Date(b.createdAt) >= oneWeekAgo);
+  const savedThisWeek = thisWeek.length;
+  const recentBookmarks = (thisWeek.length > 0 ? thisWeek : newestFirst).slice(0, 6);
+  const recentSubtitle =
+    thisWeek.length > 0 ? 'Last 7 days' : bookmarks.length > 0 ? 'Latest saves' : 'Last 7 days';
 
   const tagCounts = bookmarks.flatMap((b) => b.tags).reduce<Record<string, number>>(
     (acc, tag) => {
@@ -75,23 +84,25 @@ export default function DashboardPage() {
   const favorites = bookmarks.filter((b) => b.isFavorite).length;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
-      <div>
-        <h1 className="font-display text-3xl font-medium tracking-tight text-fg">
+    <div className="mx-auto max-w-4xl space-y-10">
+      <div className="signal-enter" style={{ ['--i' as string]: 0 }}>
+        <h1 className="font-display text-4xl font-bold tracking-tight text-fg">
           Dashboard
         </h1>
-        <p className="mt-2 text-sm text-muted">Your collection at a glance.</p>
+        <p className="mt-2 text-sm text-muted">Your signal shelf at a glance.</p>
       </div>
 
       <StatsCards
         stats={{
           total: bookmarks.length,
-          savedThisWeek: recentBookmarks.length,
+          savedThisWeek,
           mostUsedTag,
           favorites,
         }}
       />
-      <RecentBookmarks bookmarks={recentBookmarks} />
+      <div className="forge-enter" style={{ ['--i' as string]: 2 }}>
+        <RecentBookmarks bookmarks={recentBookmarks} subtitle={recentSubtitle} />
+      </div>
       <QuickAddButton />
     </div>
   );

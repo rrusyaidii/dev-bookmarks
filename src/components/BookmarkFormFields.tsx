@@ -122,11 +122,11 @@ export default function BookmarkFormFields({
         <label htmlFor="bf-tags" className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted">
           Tags
         </label>
-        <div className="flex min-h-11 flex-wrap items-center gap-1.5 border border-border bg-bg px-3 py-1.5 focus-within:border-accent">
+        <div className="flex min-h-11 flex-wrap items-center gap-1.5 rounded-[10px] border border-border bg-bg px-3 py-1.5 focus-within:border-accent">
           {values.tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-1 border border-border px-2 py-0.5 font-mono text-[11px] text-accent"
+              className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 font-mono text-[11px] text-accent"
             >
               {formatTagLabel(tag)}
               <button
@@ -160,7 +160,7 @@ export default function BookmarkFormFields({
           />
         </div>
         {showSuggestions && (
-          <div className="absolute z-10 mt-1 w-full border border-border bg-surface py-1">
+          <div className="absolute z-10 mt-1 w-full rounded-[10px] border border-border bg-surface py-1">
             {tagSuggestions.map((tag) => (
               <button
                 key={tag}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import AppearanceControls from '@/components/AppearanceControls';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: DashboardIcon },
@@ -42,20 +43,20 @@ export default function Sidebar({
           <Link href="/" onClick={onClose} className="block">
             {!collapsed ? (
               <>
-                <span className="font-display text-2xl font-medium tracking-tight text-fg">
+                <span className="font-display text-2xl font-bold tracking-tight text-fg">
                   DevMark
                 </span>
-                <span className="mt-2 block h-px w-10 bg-accent" aria-hidden />
+                <span className="signal-rule mt-2 block h-0.5 w-11 rounded-full bg-accent" aria-hidden />
               </>
             ) : (
-              <span className="font-display text-xl text-accent" title="DevMark">
+              <span className="font-display text-xl font-bold text-accent" title="DevMark">
                 D
               </span>
             )}
           </Link>
         </div>
 
-        <nav className="flex-1 space-y-0.5 px-2 py-4">
+        <nav className="flex-1 space-y-1 px-2 py-4">
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === '/'
@@ -66,7 +67,7 @@ export default function Sidebar({
                 key={item.label}
                 href={item.href}
                 onClick={onClose}
-                className={`relative flex min-h-11 items-center gap-3 px-3 py-2.5 text-sm transition-colors duration-200 ${
+                className={`relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm transition-colors duration-200 ${
                   isActive
                     ? 'bg-surface-hover text-accent'
                     : 'text-muted hover:bg-surface-hover hover:text-fg'
@@ -75,7 +76,7 @@ export default function Sidebar({
               >
                 {isActive && (
                   <span
-                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 bg-accent"
+                    className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-accent"
                     aria-hidden
                   />
                 )}
@@ -85,6 +86,8 @@ export default function Sidebar({
             );
           })}
         </nav>
+
+        <AppearanceControls collapsed={collapsed} />
 
         <div
           className={`border-t border-border p-3 ${collapsed ? 'flex justify-center' : 'flex items-center gap-2'}`}

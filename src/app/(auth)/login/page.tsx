@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
+import { ModeToggle } from '@/components/AppearanceControls';
 import { createClient } from '@/lib/supabase/client';
 
 function LoginForm() {
@@ -43,12 +44,13 @@ function LoginForm() {
   };
 
   return (
-    <div className="border border-border bg-surface p-8 sm:p-10">
+    <div className="signal-enter relative shelf-card p-8 sm:p-10">
+      <ModeToggle className="absolute right-3 top-3" />
       <div className="mb-8">
-        <p className="font-display text-2xl font-medium tracking-tight text-fg">DevMark</p>
-        <div className="mt-2 h-px w-12 bg-accent" />
-        <h1 className="mt-6 font-display text-xl font-medium text-fg">Sign in</h1>
-        <p className="mt-1 text-sm text-muted">Private collection — invite only.</p>
+        <p className="font-display text-3xl font-bold tracking-tight text-fg">DevMark</p>
+        <div className="signal-rule mt-2 h-0.5 w-12 rounded-full bg-accent" />
+        <h1 className="mt-6 font-display text-xl font-bold text-fg">Sign in</h1>
+        <p className="mt-1 text-sm text-muted">Private shelf — invite only.</p>
       </div>
 
       <form onSubmit={handleEmailLogin} className="space-y-5">
@@ -63,7 +65,7 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={loading}
-            className="h-11 w-full border border-border bg-bg px-3.5 text-sm text-fg outline-none focus-visible:border-accent disabled:opacity-50"
+            className="input-field h-11"
           />
         </div>
         <div>
@@ -78,7 +80,7 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={loading}
-            className="h-11 w-full border border-border bg-bg px-3.5 text-sm text-fg outline-none focus-visible:border-accent disabled:opacity-50"
+            className="input-field h-11"
           />
         </div>
 
@@ -94,11 +96,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="border border-border bg-surface p-8 text-sm text-muted">Loading…</div>
-      }
-    >
+    <Suspense fallback={<div className="shelf-card p-8 text-sm text-muted">Loading…</div>}>
       <LoginForm />
     </Suspense>
   );

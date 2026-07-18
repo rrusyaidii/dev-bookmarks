@@ -92,9 +92,9 @@ export default function EditBookmarkModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-bg/85" onClick={onClose} />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto border border-border bg-surface p-6 sm:p-8">
+      <div className="relative z-10 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[10px] border border-border bg-surface p-6 sm:p-8">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <h2 className="font-display text-xl font-medium text-fg">Edit bookmark</h2>
+          <h2 className="font-display text-xl font-bold text-fg">Edit bookmark</h2>
           <button
             type="button"
             onClick={onClose}

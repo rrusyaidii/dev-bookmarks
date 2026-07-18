@@ -22,9 +22,9 @@ export default function ToolsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <div>
-        <h1 className="font-display text-3xl font-medium tracking-tight text-fg">Tools</h1>
+    <div className="mx-auto max-w-2xl space-y-10">
+      <div className="signal-enter" style={{ ['--i' as string]: 0 }}>
+        <h1 className="font-display text-4xl font-bold tracking-tight text-fg">Tools</h1>
         <p className="mt-2 text-sm text-muted">
           Backup, restore, retag, and check link health.
         </p>
@@ -33,8 +33,10 @@ export default function ToolsPage() {
       {message && <p className="font-mono text-xs text-green">{message}</p>}
       {error && <p className="text-sm text-red">{error}</p>}
 
-      <section className="space-y-4 border border-border bg-surface p-5">
-        <h2 className="font-display text-lg font-medium text-fg">Export / Import</h2>
+      <section className="forge-enter space-y-4" style={{ ['--i' as string]: 1 }}>
+        <h2 className="forge-section-title font-display text-lg font-bold text-fg">
+          Export / Import
+        </h2>
         <p className="text-sm text-muted">
           Download a JSON backup, or restore bookmarks (upsert by URL).
         </p>
@@ -97,8 +99,10 @@ export default function ToolsPage() {
         </div>
       </section>
 
-      <section className="space-y-4 border border-border bg-surface p-5">
-        <h2 className="font-display text-lg font-medium text-fg">AI Retag</h2>
+      <section className="forge-enter space-y-4" style={{ ['--i' as string]: 2 }}>
+        <h2 className="forge-section-title font-display text-lg font-bold text-fg">
+          AI Retag
+        </h2>
         <p className="text-sm text-muted">
           Re-run AI tagging on every bookmark. Uses OpenRouter if configured, otherwise keyword fallback.
         </p>
@@ -120,8 +124,10 @@ export default function ToolsPage() {
         </button>
       </section>
 
-      <section className="space-y-4 border border-border bg-surface p-5">
-        <h2 className="font-display text-lg font-medium text-fg">Link health</h2>
+      <section className="forge-enter space-y-4" style={{ ['--i' as string]: 3 }}>
+        <h2 className="forge-section-title font-display text-lg font-bold text-fg">
+          Link health
+        </h2>
         <p className="text-sm text-muted">
           Check every bookmark URL (HEAD/GET). Flags broken and redirect links.
         </p>

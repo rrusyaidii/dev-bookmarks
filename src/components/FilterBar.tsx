@@ -22,36 +22,79 @@ export default function FilterBar({
       .finally(() => setLoading(false));
   }, []);
 
-  const items = [{ name: 'all', count: 0 }, ...tags];
-
   return (
-    <div className="flex items-center gap-1 overflow-x-auto border-b border-border pb-px scrollbar-none">
-      {loading && tags.length === 0 ? (
-        Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="skeleton h-9 w-16 shrink-0" />
-        ))
-      ) : (
-        items.map((tag) => {
-          const id = tag.name;
-          const isActive = active === id;
-          return (
-            <button
-              key={id}
-              onClick={() => onChange(id)}
-              className={`min-h-10 shrink-0 cursor-pointer border-b-2 px-3 py-2 font-mono text-xs transition-colors duration-200 ${
-                isActive
-                  ? 'border-accent text-accent'
-                  : 'border-transparent text-muted hover:text-fg'
-              }`}
-            >
-              {id === 'all' ? 'All' : formatTagLabel(tag.name)}
-              {id !== 'all' && (
-                <span className="ml-1.5 opacity-50">{tag.count}</span>
-              )}
-            </button>
-          );
-        })
-      )}
+    <div className="forge-filter-scroll -mx-1 overflow-x-auto px-1">
+      <div className="flex min-w-min items-stretch gap-4 border-b border-border pb-px">
+        {loading && tags.length === 0 ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton mb-2 h-8 w-14 shrink-0" />
+          ))
+        ) : (
+          <>
+            <FilterTab
+              label="All"
+              active={active === 'all'}
+              onClick={() => onChange('all')}
+              all
+            />
+            {tags.map((tag) => (
+              <FilterTab
+                key={tag.name}
+                label={formatTagLabel(tag.name)}
+                count={tag.count}
+                active={active === tag.name}
+                onClick={() => onChange(tag.name)}
+              />
+            ))}
+          </>
+        )}
+      </div>
     </div>
+  );
+}
+
+function FilterTab({
+  label,
+  count,
+  active,
+  onClick,
+  all,
+}: {
+  label: string;
+  count?: number;
+  active: boolean;
+  onClick: () => void;
+  all?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative flex min-h-10 shrink-0 cursor-pointer items-center gap-2 border-b-2 px-0.5 pb-2 pt-1 transition-colors duration-200 ${
+        active
+          ? 'border-accent text-accent'
+          : 'border-transparent text-muted hover:text-fg'
+      }`}
+    >
+      <span
+        className={
+          all
+            ? 'font-mono text-[11px] uppercase tracking-[0.14em]'
+            : 'text-sm font-medium tracking-tight'
+        }
+      >
+        {label}
+      </span>
+      {typeof count === 'number' && (
+        <>
+          <span className="select-none text-muted/40" aria-hidden>
+            ·
+          </span>
+          <span className="font-mono text-[11px] tabular-nums text-muted">
+            {count}
+          </span>
+        </>
+      )}
+    </button>
   );
 }
