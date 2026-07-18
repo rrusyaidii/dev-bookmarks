@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { suggestTags } from '@/lib/ai-tagger';
 import { serializeBookmark } from '@/lib/serialize-bookmark';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 export async function OPTIONS(request: NextRequest) {
   return corsOptionsResponse(request.headers.get('origin'));
@@ -14,8 +15,13 @@ export async function POST(
 ) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const { id } = await params;
-    const existing = await prisma.bookmark.findUnique({ where: { id } });
+    const existing = await prisma.bookmark.findFirst({
+      where: { id, userId: user.id },
+    });
 
     if (!existing) {
       return withCors(

@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { checkLink } from '@/lib/check-link';
 import { serializeBookmark } from '@/lib/serialize-bookmark';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 export async function OPTIONS(request: NextRequest) {
   return corsOptionsResponse(request.headers.get('origin'));
@@ -11,6 +12,9 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     let ids: string[] | undefined;
     try {
       const body = await request.json();
@@ -22,7 +26,10 @@ export async function POST(request: NextRequest) {
     }
 
     const bookmarks = await prisma.bookmark.findMany({
-      where: ids?.length ? { id: { in: ids } } : undefined,
+      where: {
+        userId: user.id,
+        ...(ids?.length ? { id: { in: ids } } : {}),
+      },
     });
 
     const updated = [];

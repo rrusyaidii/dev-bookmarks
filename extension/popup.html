@@ -8,9 +8,28 @@
   <body>
     <main>
       <h1>DevMark</h1>
-      <p id="title" class="title">Loading…</p>
-      <p id="url" class="url"></p>
-      <button id="save" type="button">Save bookmark</button>
+
+      <section id="login-view">
+        <p class="hint">Sign in to save bookmarks</p>
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" />
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" />
+        <button id="login" type="button">Sign in</button>
+        <p class="hint">
+          Google login:
+          <a id="web-login" href="#" target="_blank">open web app</a>
+        </p>
+      </section>
+
+      <section id="save-view" class="hidden">
+        <p id="user-email" class="hint"></p>
+        <p id="title" class="title">Loading…</p>
+        <p id="url" class="url"></p>
+        <button id="save" type="button">Save bookmark</button>
+        <button id="logout" type="button" class="secondary">Sign out</button>
+      </section>
+
       <p id="status" class="status"></p>
       <a href="options.html" target="_blank" class="options-link">Settings</a>
     </main>

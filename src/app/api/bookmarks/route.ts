@@ -9,6 +9,7 @@ import {
   type SortKey,
 } from '@/lib/serialize-bookmark';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 const SORT_KEYS: SortKey[] = ['newest', 'oldest', 'az', 'tagCount', 'favorites'];
 
@@ -19,6 +20,9 @@ export async function OPTIONS(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q');
     const tag = searchParams.get('tag');
@@ -27,6 +31,7 @@ export async function GET(request: NextRequest) {
       sortParam && SORT_KEYS.includes(sortParam) ? sortParam : 'newest';
 
     const bookmarks = await prisma.bookmark.findMany({
+      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -62,6 +67,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const body = await request.json();
     const { favicon: bodyFavicon } = body as {
       url?: string;
@@ -88,7 +96,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existing = await prisma.bookmark.findUnique({ where: { url: normalized } });
+    const existing = await prisma.bookmark.findUnique({
+      where: { userId_url: { userId: user.id, url: normalized } },
+    });
     if (existing) {
       return withCors(
         NextResponse.json(
@@ -133,6 +143,7 @@ export async function POST(request: NextRequest) {
 
     const bookmark = await prisma.bookmark.create({
       data: {
+        userId: user.id,
         url: normalized,
         title,
         description: description ?? '',

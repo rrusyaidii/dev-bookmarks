@@ -8,7 +8,7 @@
         font-family: system-ui, -apple-system, sans-serif;
         background: #0f1117;
         color: #e2e4ea;
-        max-width: 480px;
+        max-width: 520px;
         margin: 40px auto;
         padding: 0 20px;
       }
@@ -16,10 +16,15 @@
         font-size: 20px;
         color: #61dafb;
       }
+      p {
+        font-size: 13px;
+        color: #8b8fa3;
+        line-height: 1.5;
+      }
       label {
         display: block;
         font-size: 13px;
-        margin-bottom: 6px;
+        margin: 16px 0 6px;
         color: #8b8fa3;
       }
       input {
@@ -33,7 +38,7 @@
         box-sizing: border-box;
       }
       button {
-        margin-top: 14px;
+        margin-top: 18px;
         height: 36px;
         padding: 0 16px;
         border: none;
@@ -52,8 +57,21 @@
   </head>
   <body>
     <h1>DevMark Settings</h1>
+    <p>
+      After deploying, set API base to your Vercel URL (e.g.
+      <code>https://dev-bookmarks.vercel.app</code>). Copy Supabase URL and anon key from
+      Project Settings → API.
+    </p>
+
     <label for="apiBase">API base URL</label>
     <input id="apiBase" type="url" placeholder="http://localhost:3000" />
+
+    <label for="supabaseUrl">Supabase project URL</label>
+    <input id="supabaseUrl" type="url" placeholder="https://xxxx.supabase.co" />
+
+    <label for="supabaseAnonKey">Supabase anon key</label>
+    <input id="supabaseAnonKey" type="text" placeholder="eyJ..." />
+
     <button id="save" type="button">Save</button>
     <p id="status"></p>
     <script src="options.js"></script>

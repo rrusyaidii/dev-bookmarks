@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { serializeBookmark } from '@/lib/serialize-bookmark';
 import { tryNormalizeUrl } from '@/lib/url';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 interface ImportItem {
   url?: string;
@@ -21,6 +22,9 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const body = await request.json();
     const items: ImportItem[] = Array.isArray(body)
       ? body
@@ -60,7 +64,7 @@ export async function POST(request: NextRequest) {
       const isFavorite = Boolean(item.isFavorite);
 
       const existing = await prisma.bookmark.findUnique({
-        where: { url: normalized },
+        where: { userId_url: { userId: user.id, url: normalized } },
       });
 
       if (existing) {
@@ -80,6 +84,7 @@ export async function POST(request: NextRequest) {
       } else {
         const row = await prisma.bookmark.create({
           data: {
+            userId: user.id,
             url: normalized,
             title,
             description,

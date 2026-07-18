@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { serializeBookmark } from '@/lib/serialize-bookmark';
 import { tryNormalizeUrl } from '@/lib/url';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 export async function OPTIONS(request: NextRequest) {
   return corsOptionsResponse(request.headers.get('origin'));
@@ -14,8 +15,13 @@ export async function GET(
 ) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const { id } = await params;
-    const bookmark = await prisma.bookmark.findUnique({ where: { id } });
+    const bookmark = await prisma.bookmark.findFirst({
+      where: { id, userId: user.id },
+    });
 
     if (!bookmark) {
       return withCors(
@@ -40,8 +46,13 @@ export async function PUT(
 ) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const { id } = await params;
-    const existing = await prisma.bookmark.findUnique({ where: { id } });
+    const existing = await prisma.bookmark.findFirst({
+      where: { id, userId: user.id },
+    });
 
     if (!existing) {
       return withCors(
@@ -81,7 +92,9 @@ export async function PUT(
         );
       }
       if (n !== existing.url) {
-        const dup = await prisma.bookmark.findUnique({ where: { url: n } });
+        const dup = await prisma.bookmark.findUnique({
+          where: { userId_url: { userId: user.id, url: n } },
+        });
         if (dup && dup.id !== id) {
           return withCors(
             NextResponse.json(
@@ -125,8 +138,13 @@ export async function DELETE(
 ) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const { id } = await params;
-    const existing = await prisma.bookmark.findUnique({ where: { id } });
+    const existing = await prisma.bookmark.findFirst({
+      where: { id, userId: user.id },
+    });
 
     if (!existing) {
       return withCors(

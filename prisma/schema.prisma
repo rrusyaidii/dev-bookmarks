@@ -3,12 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model Bookmark {
   id            String    @id @default(cuid())
-  url           String    @unique
+  userId        String
+  url           String
   title         String
   description   String    @default("")
   favicon       String    @default("")
@@ -19,4 +20,7 @@ model Bookmark {
   lastCheckedAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, url])
+  @@index([userId])
 }

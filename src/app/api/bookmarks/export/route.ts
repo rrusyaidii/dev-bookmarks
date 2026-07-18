@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { serializeBookmark } from '@/lib/serialize-bookmark';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 export async function OPTIONS(request: NextRequest) {
   return corsOptionsResponse(request.headers.get('origin'));
@@ -10,7 +11,11 @@ export async function OPTIONS(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const bookmarks = await prisma.bookmark.findMany({
+      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     });
 

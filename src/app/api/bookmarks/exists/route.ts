@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { tryNormalizeUrl } from '@/lib/url';
 import { corsOptionsResponse, withCors } from '@/lib/cors';
+import { getAuthUser, unauthorizedJson } from '@/lib/auth';
 
 export async function OPTIONS(request: NextRequest) {
   return corsOptionsResponse(request.headers.get('origin'));
@@ -10,6 +11,9 @@ export async function OPTIONS(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const origin = request.headers.get('origin');
   try {
+    const user = await getAuthUser(request);
+    if (!user) return unauthorizedJson(origin);
+
     const url = request.nextUrl.searchParams.get('url');
     if (!url) {
       return withCors(
@@ -27,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     const existing = await prisma.bookmark.findUnique({
-      where: { url: normalized },
+      where: { userId_url: { userId: user.id, url: normalized } },
       select: { id: true, title: true },
     });
 

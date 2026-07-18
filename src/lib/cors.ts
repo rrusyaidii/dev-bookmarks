@@ -9,6 +9,19 @@ function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
   if (origin.startsWith('chrome-extension://')) return true;
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (appUrl) {
+    try {
+      if (origin === new URL(appUrl).origin) return true;
+    } catch {
+      // ignore invalid app url
+    }
+  }
+
+  // Vercel preview + production deployments
+  if (/^https:\/\/[\w.-]+\.vercel\.app$/.test(origin)) return true;
+
   return false;
 }
 
