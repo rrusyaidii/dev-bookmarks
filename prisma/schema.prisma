@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Bookmark {
+  id            String    @id @default(cuid())
+  url           String    @unique
+  title         String
+  description   String    @default("")
+  favicon       String    @default("")
+  tags          String    @default("[]")
+  notes         String    @default("")
+  isFavorite    Boolean   @default(false)
+  linkStatus    String    @default("unknown")
+  lastCheckedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}

@@ -1,0 +1,160 @@
+'use client';
+
+import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Bookmark, SortKey } from '@/types';
+import FilterBar from '@/components/FilterBar';
+import BookmarkGrid from '@/components/BookmarkGrid';
+import { sortBookmarks } from '@/lib/serialize-bookmark';
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: 'newest', label: 'Newest' },
+  { value: 'oldest', label: 'Oldest' },
+  { value: 'az', label: 'A–Z' },
+  { value: 'tagCount', label: 'Tag count' },
+  { value: 'favorites', label: 'Favorites first' },
+];
+
+function BookmarksPageInner() {
+  const searchParams = useSearchParams();
+  const initialQ = searchParams.get('q') || '';
+  const initialTag = searchParams.get('tag') || 'all';
+  const [activeTag, setActiveTag] = useState(initialTag);
+  const [searchQuery, setSearchQuery] = useState(initialQ);
+  const [sort, setSort] = useState<SortKey>('newest');
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const tag = searchParams.get('tag');
+    if (tag) setActiveTag(tag);
+    const q = searchParams.get('q');
+    if (q) setSearchQuery(q);
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetch('/api/bookmarks')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load bookmarks');
+        return res.json();
+      })
+      .then((data: Bookmark[]) => {
+        setBookmarks(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  const results = useMemo(() => {
+    let filtered = bookmarks;
+    if (activeTag !== 'all') {
+      filtered = filtered.filter((b) =>
+        b.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase())
+      );
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          b.description.toLowerCase().includes(q) ||
+          b.url.toLowerCase().includes(q) ||
+          (b.notes || '').toLowerCase().includes(q) ||
+          b.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    return sortBookmarks(filtered, sort);
+  }, [activeTag, searchQuery, bookmarks, sort]);
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-fg">Bookmarks</h1>
+          <p className="mt-1 text-sm text-muted">
+            {loading ? 'Loading...' : `${bookmarks.length} bookmarks collected`}
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            disabled={loading}
+            className="h-9 rounded-lg border border-border bg-surface px-3 text-sm text-fg outline-none focus:border-accent/40 disabled:opacity-50"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
+          <div className="relative w-full sm:w-64">
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Filter..."
+              disabled={loading}
+              className="h-9 w-full rounded-lg border border-border bg-surface pl-9 pr-3 text-sm text-fg placeholder-muted outline-none transition-colors focus:border-accent/40 disabled:opacity-50"
+            />
+          </div>
+        </div>
+      </div>
+
+      <FilterBar active={activeTag} onChange={setActiveTag} />
+
+      {error ? (
+        <div className="flex flex-col items-center gap-4 rounded-xl py-24 text-center">
+          <p className="text-red text-sm">{error}</p>
+          <p className="text-muted text-sm">Could not load bookmarks. Make sure the server is running.</p>
+        </div>
+      ) : (
+        <BookmarkGrid
+          bookmarks={results}
+          category={activeTag}
+          onDeleted={(id) => setBookmarks((prev) => prev.filter((b) => b.id !== id))}
+          onUpdated={(bookmark) =>
+            setBookmarks((prev) =>
+              prev.map((b) => (b.id === bookmark.id ? bookmark : b))
+            )
+          }
+        />
+      )}
+    </div>
+  );
+}
+
+export default function BookmarksPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="skeleton h-8 w-40" />
+          <div className="skeleton h-64 w-full rounded-xl" />
+        </div>
+      }
+    >
+      <BookmarksPageInner />
+    </Suspense>
+  );
+}

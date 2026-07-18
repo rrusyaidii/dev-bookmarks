@@ -1,0 +1,23 @@
+/** Preset tag names for autocomplete suggestions only. */
+export const PRESET_TAGS = [
+  'react',
+  'nextjs',
+  'typescript',
+  'javascript',
+  'css',
+  'tailwind',
+  'node',
+  'docker',
+  'python',
+  'database',
+  'ai',
+  'devops',
+  'testing',
+  'design',
+  'performance',
+  'security',
+  'api',
+  'frontend',
+  'backend',
+  'tooling',
+].sort();
