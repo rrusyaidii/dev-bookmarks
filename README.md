@@ -6,9 +6,9 @@ A bookmark manager I built for my own use — save a link, let AI tag it, find i
 
 ## Screenshots
 
-| Dashboard | Add bookmark | Library (folders) |
+| Dashboard | Add bookmark |
 |---|---|---|
-| ![Dashboard](public/screenshots/dashboard.png) | ![Add bookmark](public/screenshots/add.png) | ![Library](public/screenshots/library.png) |
+| ![Dashboard](public/screenshots/dashboard.png) | ![Add bookmark](public/screenshots/add.png) |
 
 ## Why
 
