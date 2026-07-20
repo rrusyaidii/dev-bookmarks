@@ -1,7 +1,11 @@
 import type { Bookmark as PrismaBookmark } from '@prisma/client';
 import type { Bookmark } from '@/types';
 
-export function serializeBookmark(bookmark: PrismaBookmark): Bookmark {
+type BookmarkWithFolders = PrismaBookmark & {
+  folders?: { id: string; name: string }[];
+};
+
+export function serializeBookmark(bookmark: BookmarkWithFolders): Bookmark {
   let tags: string[] = [];
   try {
     const parsed = JSON.parse(bookmark.tags) as unknown;
@@ -19,6 +23,7 @@ export function serializeBookmark(bookmark: PrismaBookmark): Bookmark {
     description: bookmark.description,
     favicon: bookmark.favicon,
     tags,
+    folders: (bookmark.folders ?? []).map((f) => ({ id: f.id, name: f.name })),
     notes: bookmark.notes,
     isFavorite: bookmark.isFavorite,
     linkStatus: bookmark.linkStatus as Bookmark['linkStatus'],

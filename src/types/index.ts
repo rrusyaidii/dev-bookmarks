@@ -7,6 +7,7 @@ export interface Bookmark {
   description: string;
   favicon: string;
   tags: string[];
+  folders: { id: string; name: string }[];
   notes: string;
   isFavorite: boolean;
   linkStatus: LinkStatus;
@@ -19,6 +20,12 @@ export interface Tag {
   name: string;
   count: number;
   color?: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  count: number;
 }
 
 export interface Stats {

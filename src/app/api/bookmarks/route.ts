@@ -26,12 +26,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q');
     const tag = searchParams.get('tag');
+    const folder = searchParams.get('folder');
     const sortParam = searchParams.get('sort') as SortKey | null;
     const sort: SortKey =
       sortParam && SORT_KEYS.includes(sortParam) ? sortParam : 'newest';
 
     const bookmarks = await prisma.bookmark.findMany({
-      where: { userId: user.id },
+      where: {
+        userId: user.id,
+        ...(folder === 'unfiled'
+          ? { folders: { none: {} } }
+          : folder
+            ? { folders: { some: { id: folder } } }
+            : {}),
+      },
+      include: { folders: true },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -77,6 +86,7 @@ export async function POST(request: NextRequest) {
       description?: string;
       favicon?: string;
       tags?: string[];
+      folders?: string[];
       notes?: string;
       isFavorite?: boolean;
     };
@@ -119,6 +129,13 @@ export async function POST(request: NextRequest) {
     );
     const notes = typeof body.notes === 'string' ? body.notes.trim() : '';
     const isFavorite = Boolean(body.isFavorite);
+    const rawFolders: unknown[] = Array.isArray(body.folders) ? body.folders : [];
+    const folderNames = [
+      ...new Set(
+        rawFolders.filter((f): f is string => typeof f === 'string' && f.trim().length > 0)
+          .map((f) => f.trim())
+      ),
+    ];
 
     if (!title || !description || !favicon) {
       const meta = await fetchPageMetadata(normalized);
@@ -153,7 +170,14 @@ export async function POST(request: NextRequest) {
         tags: JSON.stringify(tags),
         notes,
         isFavorite,
+        folders: {
+          connectOrCreate: folderNames.map((name) => ({
+            where: { userId_name: { userId: user.id, name } },
+            create: { userId: user.id, name },
+          })),
+        },
       },
+      include: { folders: true },
     });
 
     return withCors(
