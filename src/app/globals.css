@@ -208,6 +208,47 @@ html[data-theme="moss"][data-mode="light"] {
   --dm-scroll-hover: rgba(13, 143, 91, 0.45);
 }
 
+/* ——— Mono = black and white ——— */
+html[data-theme="mono"][data-mode="dark"] {
+  color-scheme: dark;
+  --dm-bg: #000000;
+  --dm-surface: #111111;
+  --dm-surface-hover: #1c1c1c;
+  --dm-border: #2b2b2b;
+  --dm-fg: #ffffff;
+  --dm-muted: #8a8a8a;
+  --dm-accent: #ffffff;
+  --dm-accent-dim: #b3b3b3;
+  --dm-green: #4ade80;
+  --dm-red: #f87171;
+  --dm-pink: #ffffff;
+  --dm-accent-soft: rgba(255, 255, 255, 0.1);
+  --dm-skeleton-a: rgba(255, 255, 255, 0.06);
+  --dm-skeleton-b: rgba(255, 255, 255, 0.14);
+  --dm-scroll: rgba(255, 255, 255, 0.25);
+  --dm-scroll-hover: rgba(255, 255, 255, 0.45);
+}
+
+html[data-theme="mono"][data-mode="light"] {
+  color-scheme: light;
+  --dm-bg: #ffffff;
+  --dm-surface: #f5f5f5;
+  --dm-surface-hover: #e8e8e8;
+  --dm-border: #d4d4d4;
+  --dm-fg: #0a0a0a;
+  --dm-muted: #6b6b6b;
+  --dm-accent: #0a0a0a;
+  --dm-accent-dim: #333333;
+  --dm-green: #16a34a;
+  --dm-red: #dc2626;
+  --dm-pink: #0a0a0a;
+  --dm-accent-soft: rgba(10, 10, 10, 0.08);
+  --dm-skeleton-a: rgba(10, 10, 10, 0.06);
+  --dm-skeleton-b: rgba(10, 10, 10, 0.14);
+  --dm-scroll: rgba(10, 10, 10, 0.2);
+  --dm-scroll-hover: rgba(10, 10, 10, 0.4);
+}
+
 body {
   background: var(--dm-bg);
   color: var(--dm-fg);
@@ -425,6 +466,12 @@ body {
 .btn-primary:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* Mono/light's accent is pure black — the default hardcoded dark button
+   text would be invisible against it, unlike every saturated-color theme. */
+html[data-theme="mono"][data-mode="light"] .btn-primary {
+  color: var(--dm-bg);
 }
 
 .btn-ghost {
