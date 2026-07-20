@@ -37,6 +37,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local claude config (not shared with repo)
+/CLAUDE.md
+/.claude/
+
+# vendored skill packages (installed via skills CLI, like node_modules)
+/.agents/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

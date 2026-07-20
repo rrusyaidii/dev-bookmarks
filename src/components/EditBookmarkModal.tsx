@@ -20,6 +20,7 @@ export default function EditBookmarkModal({
     title: '',
     description: '',
     tags: [],
+    folders: [],
     notes: '',
   });
   const [saving, setSaving] = useState(false);
@@ -33,6 +34,7 @@ export default function EditBookmarkModal({
         title: bookmark.title,
         description: bookmark.description,
         tags: bookmark.tags,
+        folders: bookmark.folders.map((f) => f.name),
         notes: bookmark.notes || '',
       });
       setError(null);

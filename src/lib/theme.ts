@@ -1,4 +1,4 @@
-export const THEMES = ['forge', 'ink', 'ember', 'moss'] as const;
+export const THEMES = ['forge', 'ink', 'ember', 'moss', 'mono'] as const;
 export const MODES = ['dark', 'light'] as const;
 
 export type ThemeId = (typeof THEMES)[number];
@@ -17,6 +17,7 @@ export const THEME_META: Record<
   ink: { label: 'Ink', swatchDark: '#5eb0ff', swatchLight: '#1d6fb8' },
   ember: { label: 'Ember', swatchDark: '#ff7a59', swatchLight: '#d44528' },
   moss: { label: 'Moss', swatchDark: '#3ecf8e', swatchLight: '#0d8f5b' },
+  mono: { label: 'Mono', swatchDark: '#ffffff', swatchLight: '#0a0a0a' },
 };
 
 export const STORAGE_THEME = 'devmark-theme';
@@ -67,4 +68,4 @@ export function toggleMode(current: ModeId): ModeId {
 }
 
 /** Inline script body for FOUC-free boot (no imports). */
-export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var t=localStorage.getItem('${STORAGE_THEME}');var m=localStorage.getItem('${STORAGE_MODE}');var themes=['forge','ink','ember','moss'];var modes=['dark','light'];var theme=themes.indexOf(t)>-1?t:'forge';var mode=modes.indexOf(m)>-1?m:'dark';var r=document.documentElement;r.setAttribute('data-theme',theme);r.setAttribute('data-mode',mode);}catch(e){}})();`;
+export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var t=localStorage.getItem('${STORAGE_THEME}');var m=localStorage.getItem('${STORAGE_MODE}');var themes=['forge','ink','ember','moss','mono'];var modes=['dark','light'];var theme=themes.indexOf(t)>-1?t:'forge';var mode=modes.indexOf(m)>-1?m:'dark';var r=document.documentElement;r.setAttribute('data-theme',theme);r.setAttribute('data-mode',mode);}catch(e){}})();`;

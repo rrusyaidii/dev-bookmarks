@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       const row = await prisma.bookmark.update({
         where: { id: b.id },
         data: { tags: JSON.stringify(tags) },
+        include: { folders: true },
       });
       updated.push(serializeBookmark(row));
     }

@@ -1,27 +1,41 @@
 # DevMark
 
-Personal bookmark manager for developers. Save links, AI auto-tags them, browse by tag, search, export/import.
+A bookmark manager I built for my own use — save a link, let AI tag it, find it again by tag, folder, or search. No sign-up flow, no multi-tenant complexity: it's a single-user app locked to one email, so all the effort goes into the actual workflow instead of accounts.
 
-**Live:** [https://dev-bookmarks-eight.vercel.app](https://dev-bookmarks-eight.vercel.app)
+**Live:** [dev-bookmarks-eight.vercel.app](https://dev-bookmarks-eight.vercel.app)
 
-## Stack
+## Screenshots
 
-- Next.js (App Router) + TypeScript
-- Supabase Auth (email/password) + Postgres
-- Prisma ORM
-- OpenRouter (AI tagging)
-- Tailwind CSS v4
-- Deployed on Vercel
+| Dashboard | Add bookmark | Library (folders) |
+|---|---|---|
+| ![Dashboard](public/screenshots/dashboard.png) | ![Add bookmark](public/screenshots/add.png) | ![Library](public/screenshots/library.png) |
 
-Single-user by design: set `ALLOWED_EMAIL` and disable new sign-ups in Supabase.
+## Why
+
+I kept losing track of dev articles, docs, and tools in browser bookmark folders I'd never open again. This is the tool I wanted: paste a URL, get metadata and tags automatically, and actually be able to find things later by tag, folder, or free-text search — plus a dead-link check so the collection doesn't quietly rot.
 
 ## Features
 
-- Add bookmarks with auto metadata + AI tags
-- Dashboard, search, tag filters, favorites, notes
-- Edit / delete / retag
-- Tools: export/import JSON, retag all, check dead links
-- Private login (owner email only)
+- **Add bookmarks fast** — paste a URL, metadata (title, description, favicon) is fetched automatically
+- **AI auto-tagging** via OpenRouter, with manual retag support
+- **Folders** — organize bookmarks into folders, drag-and-drop between them, browse in a dedicated Library view
+- **Search & filter** — by tag, by folder, or free-text
+- **Favorites & notes** on any bookmark
+- **Card / list view toggle**
+- **Five themes** (including a pure black-and-white "Mono" mode), each with light/dark variants
+- **Tools:** export/import as JSON, bulk retag, dead-link checker
+- **Private by design** — single allowed login email, no public sign-up
+
+## Stack
+
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router) + TypeScript, React 19 |
+| Auth | Supabase Auth (email/password, single-user lock) |
+| Database | Postgres via Prisma ORM (`@prisma/adapter-pg`) |
+| AI | OpenRouter for automatic tagging |
+| Styling | Tailwind CSS v4 |
+| Hosting | Vercel |
 
 ## Local setup
 
@@ -66,4 +80,4 @@ npm run lint
 
 ## License
 
-Private project.
+MIT — see [LICENSE](LICENSE).

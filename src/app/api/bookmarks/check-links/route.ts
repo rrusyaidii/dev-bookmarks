@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
           linkStatus,
           lastCheckedAt: new Date(),
         },
+        include: { folders: true },
       });
       updated.push(serializeBookmark(row));
     }

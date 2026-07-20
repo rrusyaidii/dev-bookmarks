@@ -21,6 +21,7 @@ export async function GET(
     const { id } = await params;
     const bookmark = await prisma.bookmark.findFirst({
       where: { id, userId: user.id },
+      include: { folders: true },
     });
 
     if (!bookmark) {
@@ -68,6 +69,7 @@ export async function PUT(
       description,
       favicon,
       tags,
+      folders,
       notes,
       isFavorite,
       linkStatus,
@@ -77,10 +79,21 @@ export async function PUT(
       description?: string;
       favicon?: string;
       tags?: string[];
+      folders?: string[];
       notes?: string;
       isFavorite?: boolean;
       linkStatus?: string;
     };
+
+    const folderNames = folders
+      ? [
+          ...new Set(
+            folders
+              .filter((f): f is string => typeof f === 'string' && f.trim().length > 0)
+              .map((f) => f.trim())
+          ),
+        ]
+      : undefined;
 
     let normalizedUrl: string | undefined;
     if (url !== undefined) {
@@ -119,7 +132,17 @@ export async function PUT(
         ...(notes !== undefined && { notes }),
         ...(isFavorite !== undefined && { isFavorite: Boolean(isFavorite) }),
         ...(linkStatus !== undefined && { linkStatus }),
+        ...(folderNames !== undefined && {
+          folders: {
+            set: [],
+            connectOrCreate: folderNames.map((name) => ({
+              where: { userId_name: { userId: user.id, name } },
+              create: { userId: user.id, name },
+            })),
+          },
+        }),
       },
+      include: { folders: true },
     });
 
     return withCors(

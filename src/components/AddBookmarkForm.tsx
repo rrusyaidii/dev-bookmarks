@@ -13,6 +13,7 @@ export default function AddBookmarkForm() {
     title: '',
     description: '',
     tags: [],
+    folders: [],
     notes: '',
   });
   const [favicon, setFavicon] = useState('');
@@ -88,6 +89,7 @@ export default function AddBookmarkForm() {
             description: values.description || undefined,
             favicon: favicon || undefined,
             tags: values.tags,
+            folders: values.folders,
             notes: values.notes || undefined,
           }),
         });

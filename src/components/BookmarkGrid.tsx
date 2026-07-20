@@ -60,11 +60,15 @@ function Skeleton({ cards }: { cards: boolean }) {
 export default function BookmarkGrid({
   bookmarks,
   category,
+  emptyMessage,
+  dragEnabled,
   onDeleted,
   onUpdated,
 }: {
   bookmarks: Bookmark[];
   category: string;
+  emptyMessage?: string;
+  dragEnabled?: boolean;
   onDeleted?: (id: string) => void;
   onUpdated?: (bookmark: Bookmark) => void;
 }) {
@@ -165,9 +169,10 @@ export default function BookmarkGrid({
       <div className="border-y border-dashed border-border py-20 text-center">
         <p className="text-sm font-medium text-fg">No bookmarks found</p>
         <p className="mt-2 text-sm text-muted">
-          {category === 'all'
-            ? 'Your collection is empty. Add your first bookmark.'
-            : `Nothing tagged “${formatTagLabel(category)}”.`}
+          {emptyMessage ??
+            (category === 'all'
+              ? 'Your collection is empty. Add your first bookmark.'
+              : `Nothing tagged “${formatTagLabel(category)}”.`)}
         </p>
       </div>
     );
@@ -189,13 +194,25 @@ export default function BookmarkGrid({
       {view === 'cards' ? (
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {bookmarks.map((bookmark, i) => (
-            <CardItem key={bookmark.id} bookmark={bookmark} index={i} {...actions} />
+            <CardItem
+              key={bookmark.id}
+              bookmark={bookmark}
+              index={i}
+              dragEnabled={dragEnabled}
+              {...actions}
+            />
           ))}
         </ul>
       ) : (
         <ul className="divide-y divide-border">
           {bookmarks.map((bookmark, i) => (
-            <ListItem key={bookmark.id} bookmark={bookmark} index={i} {...actions} />
+            <ListItem
+              key={bookmark.id}
+              bookmark={bookmark}
+              index={i}
+              dragEnabled={dragEnabled}
+              {...actions}
+            />
           ))}
         </ul>
       )}
@@ -290,8 +307,9 @@ function ActionCluster({
 function ListItem({
   bookmark,
   index,
+  dragEnabled,
   ...actions
-}: { bookmark: Bookmark; index: number } & RowActions) {
+}: { bookmark: Bookmark; index: number; dragEnabled?: boolean } & RowActions) {
   const domain = domainOf(bookmark.url);
   const tags = bookmark.tags.slice(0, 3).map(formatTagLabel);
   const extra = bookmark.tags.length - tags.length;
@@ -304,15 +322,30 @@ function ListItem({
   const meta = [domain, ...tags, extra > 0 ? `+${extra}` : null, status, date].filter(
     Boolean
   ) as string[];
+  const [dragging, setDragging] = useState(false);
 
   return (
     <li
-      className="forge-row forge-enter group flex items-start gap-3 px-1 py-3 sm:px-2"
+      className={`forge-row forge-enter group flex items-start gap-3 px-1 py-3 sm:px-2 ${
+        dragEnabled ? 'cursor-grab active:cursor-grabbing' : ''
+      } ${dragging ? 'opacity-40' : ''}`}
       style={{ ['--i' as string]: Math.min(index, 12) }}
+      draggable={dragEnabled}
+      onDragStart={
+        dragEnabled
+          ? (e) => {
+              e.dataTransfer.setData('text/plain', bookmark.id);
+              e.dataTransfer.effectAllowed = 'move';
+              setDragging(true);
+            }
+          : undefined
+      }
+      onDragEnd={dragEnabled ? () => setDragging(false) : undefined}
     >
       <img
         src={bookmark.favicon}
         alt=""
+        draggable={false}
         className="mt-1 size-5 shrink-0 opacity-80"
         onError={(e) => {
           (e.target as HTMLImageElement).src = faviconFallback(20);
@@ -366,8 +399,9 @@ function ListItem({
 function CardItem({
   bookmark,
   index,
+  dragEnabled,
   ...actions
-}: { bookmark: Bookmark; index: number } & RowActions) {
+}: { bookmark: Bookmark; index: number; dragEnabled?: boolean } & RowActions) {
   const domain = domainOf(bookmark.url);
   const tags = bookmark.tags.slice(0, 2).map(formatTagLabel);
   const status = statusLabel(bookmark.linkStatus);
@@ -376,17 +410,32 @@ function CardItem({
     day: 'numeric',
   });
   const meta = [...tags, status, date].filter(Boolean) as string[];
+  const [dragging, setDragging] = useState(false);
 
   return (
     <li
-      className="signal-enter shelf-card group flex flex-col p-4"
+      className={`signal-enter shelf-card group flex flex-col p-4 ${
+        dragEnabled ? 'cursor-grab active:cursor-grabbing' : ''
+      } ${dragging ? 'opacity-40' : ''}`}
       style={{ ['--i' as string]: Math.min(index, 12) }}
+      draggable={dragEnabled}
+      onDragStart={
+        dragEnabled
+          ? (e) => {
+              e.dataTransfer.setData('text/plain', bookmark.id);
+              e.dataTransfer.effectAllowed = 'move';
+              setDragging(true);
+            }
+          : undefined
+      }
+      onDragEnd={dragEnabled ? () => setDragging(false) : undefined}
     >
       <div className="flex flex-col gap-2">
         <div className="flex min-w-0 items-start gap-2.5">
           <img
             src={bookmark.favicon}
             alt=""
+            draggable={false}
             className="mt-0.5 size-5 shrink-0 opacity-80"
             onError={(e) => {
               (e.target as HTMLImageElement).src = faviconFallback(20);
