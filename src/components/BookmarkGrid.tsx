@@ -345,6 +345,7 @@ function ListItem({
       <img
         src={bookmark.favicon}
         alt=""
+        draggable={false}
         className="mt-1 size-5 shrink-0 opacity-80"
         onError={(e) => {
           (e.target as HTMLImageElement).src = faviconFallback(20);
@@ -434,6 +435,7 @@ function CardItem({
           <img
             src={bookmark.favicon}
             alt=""
+            draggable={false}
             className="mt-0.5 size-5 shrink-0 opacity-80"
             onError={(e) => {
               (e.target as HTMLImageElement).src = faviconFallback(20);

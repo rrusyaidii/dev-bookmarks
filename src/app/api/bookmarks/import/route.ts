@@ -11,6 +11,7 @@ interface ImportItem {
   description?: string;
   favicon?: string;
   tags?: string[];
+  folders?: { name: string }[];
   notes?: string;
   isFavorite?: boolean;
 }
@@ -62,6 +63,13 @@ export async function POST(request: NextRequest) {
         : [];
       const notes = typeof item.notes === 'string' ? item.notes : '';
       const isFavorite = Boolean(item.isFavorite);
+      const folderNames = [
+        ...new Set(
+          (Array.isArray(item.folders) ? item.folders : [])
+            .map((f) => (f && typeof f.name === 'string' ? f.name.trim() : ''))
+            .filter((name) => name.length > 0)
+        ),
+      ];
 
       const existing = await prisma.bookmark.findUnique({
         where: { userId_url: { userId: user.id, url: normalized } },
@@ -77,7 +85,15 @@ export async function POST(request: NextRequest) {
             tags: JSON.stringify(tags),
             notes,
             isFavorite,
+            folders: {
+              set: [],
+              connectOrCreate: folderNames.map((name) => ({
+                where: { userId_name: { userId: user.id, name } },
+                create: { userId: user.id, name },
+              })),
+            },
           },
+          include: { folders: true },
         });
         updated += 1;
         results.push(serializeBookmark(row));
@@ -92,7 +108,14 @@ export async function POST(request: NextRequest) {
             tags: JSON.stringify(tags),
             notes,
             isFavorite,
+            folders: {
+              connectOrCreate: folderNames.map((name) => ({
+                where: { userId_name: { userId: user.id, name } },
+                create: { userId: user.id, name },
+              })),
+            },
           },
+          include: { folders: true },
         });
         created += 1;
         results.push(serializeBookmark(row));

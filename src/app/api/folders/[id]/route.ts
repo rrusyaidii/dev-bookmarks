@@ -35,7 +35,7 @@ export async function PATCH(
       const dup = await prisma.folder.findUnique({
         where: { userId_name: { userId: user.id, name } },
       });
-      if (dup) {
+      if (dup && dup.id !== id) {
         return withCors(
           NextResponse.json({ error: 'A folder with this name already exists' }, { status: 409 }),
           origin

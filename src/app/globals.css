@@ -34,6 +34,7 @@ html {
   --dm-muted: #8b92a5;
   --dm-accent: #ff5c4d;
   --dm-accent-dim: #c94338;
+  --dm-accent-contrast: #07080c;
   --dm-green: #4ade80;
   --dm-red: #f87171;
   --dm-pink: #ff5c4d;
@@ -55,6 +56,7 @@ html[data-theme="forge"][data-mode="dark"] {
   --dm-muted: #8b92a5;
   --dm-accent: #ff5c4d;
   --dm-accent-dim: #c94338;
+  --dm-accent-contrast: #07080c;
   --dm-green: #4ade80;
   --dm-red: #f87171;
   --dm-pink: #ff5c4d;
@@ -75,6 +77,7 @@ html[data-theme="forge"][data-mode="light"] {
   --dm-muted: #5c6378;
   --dm-accent: #e03e30;
   --dm-accent-dim: #b32f24;
+  --dm-accent-contrast: #07080c;
   --dm-green: #16a34a;
   --dm-red: #dc2626;
   --dm-pink: #e03e30;
@@ -96,6 +99,7 @@ html[data-theme="ink"][data-mode="dark"] {
   --dm-muted: #8896ab;
   --dm-accent: #5eb0ff;
   --dm-accent-dim: #3a7fc4;
+  --dm-accent-contrast: #07080c;
   --dm-green: #4ade80;
   --dm-red: #f87171;
   --dm-pink: #5eb0ff;
@@ -116,6 +120,7 @@ html[data-theme="ink"][data-mode="light"] {
   --dm-muted: #556274;
   --dm-accent: #1d6fb8;
   --dm-accent-dim: #155590;
+  --dm-accent-contrast: #07080c;
   --dm-green: #16a34a;
   --dm-red: #dc2626;
   --dm-pink: #1d6fb8;
@@ -137,6 +142,7 @@ html[data-theme="ember"][data-mode="dark"] {
   --dm-muted: #a8989c;
   --dm-accent: #ff7a59;
   --dm-accent-dim: #d45638;
+  --dm-accent-contrast: #07080c;
   --dm-green: #4ade80;
   --dm-red: #f87171;
   --dm-pink: #ff7a59;
@@ -157,6 +163,7 @@ html[data-theme="ember"][data-mode="light"] {
   --dm-muted: #6e5854;
   --dm-accent: #d44528;
   --dm-accent-dim: #a8341c;
+  --dm-accent-contrast: #07080c;
   --dm-green: #16a34a;
   --dm-red: #dc2626;
   --dm-pink: #d44528;
@@ -178,6 +185,7 @@ html[data-theme="moss"][data-mode="dark"] {
   --dm-muted: #8fa39a;
   --dm-accent: #3ecf8e;
   --dm-accent-dim: #2a9e6a;
+  --dm-accent-contrast: #07080c;
   --dm-green: #3ecf8e;
   --dm-red: #f87171;
   --dm-pink: #3ecf8e;
@@ -198,6 +206,7 @@ html[data-theme="moss"][data-mode="light"] {
   --dm-muted: #556b60;
   --dm-accent: #0d8f5b;
   --dm-accent-dim: #0a6e46;
+  --dm-accent-contrast: #07080c;
   --dm-green: #0d8f5b;
   --dm-red: #dc2626;
   --dm-pink: #0d8f5b;
@@ -219,6 +228,7 @@ html[data-theme="mono"][data-mode="dark"] {
   --dm-muted: #8a8a8a;
   --dm-accent: #ffffff;
   --dm-accent-dim: #b3b3b3;
+  --dm-accent-contrast: #07080c;
   --dm-green: #4ade80;
   --dm-red: #f87171;
   --dm-pink: #ffffff;
@@ -239,6 +249,7 @@ html[data-theme="mono"][data-mode="light"] {
   --dm-muted: #6b6b6b;
   --dm-accent: #0a0a0a;
   --dm-accent-dim: #333333;
+  --dm-accent-contrast: #ffffff;
   --dm-green: #16a34a;
   --dm-red: #dc2626;
   --dm-pink: #0a0a0a;
@@ -454,7 +465,7 @@ body {
   padding: 0 1.25rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #07080c;
+  color: var(--dm-accent-contrast);
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
@@ -466,12 +477,6 @@ body {
 .btn-primary:disabled {
   cursor: not-allowed;
   opacity: 0.5;
-}
-
-/* Mono/light's accent is pure black — the default hardcoded dark button
-   text would be invisible against it, unlike every saturated-color theme. */
-html[data-theme="mono"][data-mode="light"] .btn-primary {
-  color: var(--dm-bg);
 }
 
 .btn-ghost {

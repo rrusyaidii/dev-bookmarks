@@ -15,6 +15,7 @@ export default function LibraryPage() {
   const [creating, setCreating] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const cancelingRenameRef = useRef(false);
 
   const loadFolders = useCallback(() => {
     return fetch('/api/folders')
@@ -124,7 +125,10 @@ export default function LibraryPage() {
       let newNames: string[];
       if (targetId === 'unfiled') {
         if (currentNames.length === 0) return;
-        newNames = [];
+        const activeFolder = folders.find((f) => f.id === active);
+        newNames = activeFolder
+          ? currentNames.filter((n) => n !== activeFolder.name)
+          : [];
       } else {
         const folder = folders.find((f) => f.id === targetId);
         if (!folder || currentNames.includes(folder.name)) return;
@@ -209,9 +213,18 @@ export default function LibraryPage() {
                         onChange={(e) => setRenameValue(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleRename(folder.id);
-                          if (e.key === 'Escape') setRenamingId(null);
+                          if (e.key === 'Escape') {
+                            cancelingRenameRef.current = true;
+                            setRenamingId(null);
+                          }
                         }}
-                        onBlur={() => handleRename(folder.id)}
+                        onBlur={() => {
+                          if (cancelingRenameRef.current) {
+                            cancelingRenameRef.current = false;
+                            return;
+                          }
+                          handleRename(folder.id);
+                        }}
                         className="input-field h-9 text-sm"
                       />
                     </li>

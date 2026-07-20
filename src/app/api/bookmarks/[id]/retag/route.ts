@@ -39,6 +39,7 @@ export async function POST(
     const bookmark = await prisma.bookmark.update({
       where: { id },
       data: { tags: JSON.stringify(tags) },
+      include: { folders: true },
     });
 
     return withCors(
