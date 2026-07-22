@@ -198,12 +198,15 @@ export default function LibraryPage() {
         <p className="mt-2 font-mono text-xs text-muted">Bookmarks organized into folders.</p>
       </div>
 
-      <div className="signal-enter space-y-3" style={{ ['--i' as string]: 1 }}>
+      <div
+        className="signal-enter sticky top-14 z-10 space-y-3 border-b border-border bg-bg pb-5 pt-3"
+        style={{ ['--i' as string]: 1 }}
+      >
         <div className="flex items-baseline justify-between gap-4">
           <p className="signal-section-title font-mono text-[11px] uppercase tracking-wider text-muted">
             Folders
           </p>
-          <p className="text-xs text-muted">Drag a bookmark onto a folder to file it.</p>
+          <p className="hidden text-xs text-muted sm:block">Drag a bookmark onto a folder to file it.</p>
         </div>
 
         {foldersLoading ? (
