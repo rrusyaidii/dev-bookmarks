@@ -80,7 +80,7 @@ function BookmarksPageInner() {
     return () => controller.abort();
   }, [sort]);
 
-  const results = useMemo(() => {
+  const { results, totalCount } = useMemo(() => {
     let filtered = bookmarks;
     if (activeTag !== 'all') {
       filtered = filtered.filter((b) =>
@@ -99,7 +99,7 @@ function BookmarksPageInner() {
       );
     }
     const sorted = sortBookmarks(filtered, sort);
-    return sorted.slice(0, displayLimit);
+    return { results: sorted.slice(0, displayLimit), totalCount: sorted.length };
   }, [activeTag, debouncedQuery, bookmarks, sort, displayLimit]);
 
   const isFiltered = activeTag !== 'all' || Boolean(searchQuery.trim());
@@ -179,13 +179,13 @@ function BookmarksPageInner() {
                 )
               }
             />
-            {results.length > 0 && results.length < bookmarks.length && (
+            {displayLimit < totalCount && (
               <div className="flex justify-center pt-8">
                 <button
                   onClick={() => setDisplayLimit((prev) => prev + 50)}
                   className="rounded-[10px] border border-border bg-bg px-4 py-2 font-mono text-sm text-fg transition-colors hover:bg-surface-hover"
                 >
-                  Load more
+                  Load more ({results.length} of {totalCount})
                 </button>
               </div>
             )}
