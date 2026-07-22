@@ -28,7 +28,7 @@ function BookmarksPageInner() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const debounceTimer = useRef<NodeJS.Timeout>();
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   const updateSearch = useCallback((query: string) => {
     startTransition(() => setSearchQuery(query));
