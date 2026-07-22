@@ -2,7 +2,7 @@
 
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
-import { ReactNode, useState, useCallback, useMemo } from 'react';
+import { ReactNode, useState, useCallback } from 'react';
 
 export default function DashboardShell({
   children,
@@ -16,34 +16,23 @@ export default function DashboardShell({
 
   const toggleMobile = useCallback(() => setMobileOpen((v) => !v), []);
   const toggleCollapse = useCallback(() => setCollapsed((v) => !v), []);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
 
-  const sidebarElement = useMemo(
-    () => (
+  return (
+    <div className="flex min-h-screen bg-bg">
       <Sidebar
         open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
+        onClose={closeMobile}
         collapsed={collapsed}
         onToggleCollapse={toggleCollapse}
         userEmail={userEmail}
       />
-    ),
-    [mobileOpen, collapsed, toggleCollapse, userEmail]
-  );
-
-  const topBarElement = useMemo(
-    () => <TopBar onMenuToggle={toggleMobile} userEmail={userEmail} />,
-    [toggleMobile, userEmail]
-  );
-
-  return (
-    <div className="flex min-h-screen bg-bg">
-      {sidebarElement}
       <div
         className={`flex min-w-0 flex-1 flex-col transition-[margin] duration-200 ${
           collapsed ? 'md:ml-16' : 'md:ml-56'
         }`}
       >
-        {topBarElement}
+        <TopBar onMenuToggle={toggleMobile} userEmail={userEmail} />
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-10 lg:px-10">
           {children}
         </main>
