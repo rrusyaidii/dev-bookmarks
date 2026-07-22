@@ -27,6 +27,7 @@ function BookmarksPageInner() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [displayLimit, setDisplayLimit] = useState(50);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -40,12 +41,17 @@ function BookmarksPageInner() {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
       setDebouncedQuery(searchQuery);
+      setDisplayLimit(50);
     }, 300);
 
     return () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [searchQuery]);
+
+  useEffect(() => {
+    setDisplayLimit(50);
+  }, [activeTag]);
 
   useEffect(() => {
     setLoading(true);
@@ -92,8 +98,9 @@ function BookmarksPageInner() {
           b.tags.some((t) => t.toLowerCase().includes(q))
       );
     }
-    return sortBookmarks(filtered, sort);
-  }, [activeTag, debouncedQuery, bookmarks, sort]);
+    const sorted = sortBookmarks(filtered, sort);
+    return sorted.slice(0, displayLimit);
+  }, [activeTag, debouncedQuery, bookmarks, sort, displayLimit]);
 
   const isFiltered = activeTag !== 'all' || Boolean(searchQuery.trim());
   const countLabel = loading
@@ -161,16 +168,28 @@ function BookmarksPageInner() {
             <p className="mt-2 text-sm text-muted">Could not load bookmarks.</p>
           </div>
         ) : (
-          <BookmarkGrid
-            bookmarks={results}
-            category={activeTag}
-            onDeleted={(id) => setBookmarks((prev) => prev.filter((b) => b.id !== id))}
-            onUpdated={(bookmark) =>
-              setBookmarks((prev) =>
-                prev.map((b) => (b.id === bookmark.id ? bookmark : b))
-              )
-            }
-          />
+          <>
+            <BookmarkGrid
+              bookmarks={results}
+              category={activeTag}
+              onDeleted={(id) => setBookmarks((prev) => prev.filter((b) => b.id !== id))}
+              onUpdated={(bookmark) =>
+                setBookmarks((prev) =>
+                  prev.map((b) => (b.id === bookmark.id ? bookmark : b))
+                )
+              }
+            />
+            {results.length > 0 && results.length < bookmarks.length && (
+              <div className="flex justify-center pt-8">
+                <button
+                  onClick={() => setDisplayLimit((prev) => prev + 50)}
+                  className="rounded-[10px] border border-border bg-bg px-4 py-2 font-mono text-sm text-fg transition-colors hover:bg-surface-hover"
+                >
+                  Load more
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
