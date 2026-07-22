@@ -30,43 +30,78 @@ export async function GET(request: NextRequest) {
     const sortParam = searchParams.get('sort') as SortKey | null;
     const sort: SortKey =
       sortParam && SORT_KEYS.includes(sortParam) ? sortParam : 'newest';
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(100, parseInt(searchParams.get('limit') || '50'));
+    const skip = (page - 1) * limit;
 
-    const bookmarks = await prisma.bookmark.findMany({
-      where: {
-        userId: user.id,
-        ...(folder === 'unfiled'
-          ? { folders: { none: {} } }
-          : folder
-            ? { folders: { some: { id: folder } } }
-            : {}),
-      },
-      include: { folders: true },
-      orderBy: { createdAt: 'desc' },
-    });
+    const where: any = {
+      userId: user.id,
+      ...(folder === 'unfiled'
+        ? { folders: { none: {} } }
+        : folder
+          ? { folders: { some: { id: folder } } }
+          : {}),
+    };
 
-    let filtered = bookmarks.map(serializeBookmark);
+    if (tag) {
+      where.tags = {
+        contains: tag,
+      };
+    }
 
     if (q) {
       const query = q.toLowerCase();
-      filtered = filtered.filter(
-        (b) =>
-          b.title.toLowerCase().includes(query) ||
-          b.description.toLowerCase().includes(query) ||
-          b.url.toLowerCase().includes(query) ||
-          b.notes.toLowerCase().includes(query) ||
-          b.tags.some((t) => t.toLowerCase().includes(query))
-      );
+      where.OR = [
+        { title: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+        { url: { contains: query, mode: 'insensitive' } },
+        { notes: { contains: query, mode: 'insensitive' } },
+        { tags: { contains: query } },
+      ];
     }
 
-    if (tag) {
-      filtered = filtered.filter((b) =>
-        b.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
-      );
+    const orderBy: any = {};
+    switch (sort) {
+      case 'oldest':
+        orderBy.createdAt = 'asc';
+        break;
+      case 'az':
+        orderBy.title = 'asc';
+        break;
+      case 'tagCount':
+        orderBy.tags = 'desc';
+        break;
+      case 'favorites':
+        orderBy.isFavorite = 'desc';
+        break;
+      default:
+        orderBy.createdAt = 'desc';
     }
 
-    filtered = sortBookmarks(filtered, sort);
+    const [bookmarks, total] = await Promise.all([
+      prisma.bookmark.findMany({
+        where,
+        include: { folders: true },
+        orderBy,
+        skip,
+        take: limit,
+      }),
+      prisma.bookmark.count({ where }),
+    ]);
 
-    return withCors(NextResponse.json(filtered, { status: 200 }), origin);
+    const serialized = bookmarks.map(serializeBookmark);
+
+    const response = NextResponse.json({
+      data: serialized,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+    response.headers.set('Cache-Control', 'private, max-age=30');
+    return withCors(response, origin);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch bookmarks';
     return withCors(NextResponse.json({ error: message }, { status: 500 }), origin);

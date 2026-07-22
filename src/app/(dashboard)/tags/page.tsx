@@ -11,7 +11,8 @@ export default function TagsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/tags')
+    const controller = new AbortController();
+    fetch('/api/tags', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load tags');
         return res.json();
@@ -21,9 +22,13 @@ export default function TagsPage() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
-        setLoading(false);
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+          setLoading(false);
+        }
       });
+
+    return () => controller.abort();
   }, []);
 
   return (

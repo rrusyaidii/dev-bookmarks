@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Bookmark } from '@/types';
+import { memo } from 'react';
 
 function domainOf(url: string): string {
   try {
@@ -11,7 +12,7 @@ function domainOf(url: string): string {
   }
 }
 
-export default function RecentBookmarks({
+const RecentBookmarks = memo(function RecentBookmarks({
   bookmarks,
   subtitle = 'Last 7 days',
 }: {
@@ -61,10 +62,13 @@ export default function RecentBookmarks({
                   <img
                     src={bookmark.favicon}
                     alt=""
+                    loading="lazy"
                     className="mt-0.5 size-6 shrink-0 rounded-md opacity-90"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Crect fill='%23808080' fill-opacity='0.25' width='24' height='24' rx='4'/%3E%3C/svg%3E";
+                      const img = e.target as HTMLImageElement;
+                      const domain = domainOf(bookmark.url);
+                      const initial = domain.charAt(0).toUpperCase();
+                      img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Crect fill='%23999' width='24' height='24' rx='4'/%3E%3Ctext x='50%25' y='50%25' font-size='14' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'%3E${initial}%3C/text%3E%3C/svg%3E`;
                     }}
                   />
                   <div className="min-w-0 flex-1">
@@ -92,7 +96,9 @@ export default function RecentBookmarks({
       )}
     </section>
   );
-}
+});
+
+export default RecentBookmarks;
 
 function formatRelative(dateStr: string): string {
   const d = new Date(dateStr);

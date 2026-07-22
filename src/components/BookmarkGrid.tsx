@@ -1,7 +1,7 @@
 'use client';
 
 import { Bookmark } from '@/types';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import CopyLinkIcon from './CopyLinkIcon';
 import EditBookmarkModal from './EditBookmarkModal';
 import { useViewMode } from '@/hooks/use-view-mode';
@@ -21,8 +21,22 @@ function statusLabel(status: Bookmark['linkStatus']): string | null {
   return null;
 }
 
-function faviconFallback(size: number) {
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'%3E%3Crect fill='%23808080' fill-opacity='0.25' width='${size}' height='${size}'/%3E%3C/svg%3E`;
+const faviconCache = new Map<string, string>();
+
+function faviconFallback(size: number, domain?: string) {
+  if (!domain) {
+    return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}'%3E%3Crect fill='%23ccc' width='${size}' height='${size}'/%3E%3C/svg%3E`;
+  }
+
+  const cacheKey = `${domain}-${size}`;
+  if (faviconCache.has(cacheKey)) {
+    return faviconCache.get(cacheKey)!;
+  }
+
+  const initial = domain.charAt(0).toUpperCase();
+  const encoded = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'%3E%3Crect fill='%23999' width='${size}' height='${size}'/%3E%3Ctext x='50%25' y='50%25' font-size='${Math.round(size * 0.6)}' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'%3E${initial}%3C/text%3E%3C/svg%3E`;
+  faviconCache.set(cacheKey, encoded);
+  return encoded;
 }
 
 function Skeleton({ cards }: { cards: boolean }) {
@@ -86,10 +100,9 @@ export default function BookmarkGrid({
   }, [category, view]);
 
   const handleCopy = useCallback(async (bookmark: Bookmark) => {
+    setCopiedId(bookmark.id);
     try {
       await navigator.clipboard.writeText(bookmark.url);
-      setCopiedId(bookmark.id);
-      setTimeout(() => setCopiedId(null), 2000);
     } catch {
       const ta = document.createElement('textarea');
       ta.value = bookmark.url;
@@ -97,9 +110,8 @@ export default function BookmarkGrid({
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      setCopiedId(bookmark.id);
-      setTimeout(() => setCopiedId(null), 2000);
     }
+    setTimeout(() => setCopiedId(null), 2000);
   }, []);
 
   const handleDelete = useCallback(
@@ -304,7 +316,7 @@ function ActionCluster({
   );
 }
 
-function ListItem({
+const ListItem = memo(function ListItem({
   bookmark,
   index,
   dragEnabled,
@@ -346,9 +358,10 @@ function ListItem({
         src={bookmark.favicon}
         alt=""
         draggable={false}
+        loading="lazy"
         className="mt-1 size-5 shrink-0 opacity-80"
         onError={(e) => {
-          (e.target as HTMLImageElement).src = faviconFallback(20);
+          (e.target as HTMLImageElement).src = faviconFallback(20, domain);
         }}
       />
       <div className="min-w-0 flex-1">
@@ -394,9 +407,9 @@ function ListItem({
       </div>
     </li>
   );
-}
+});
 
-function CardItem({
+const CardItem = memo(function CardItem({
   bookmark,
   index,
   dragEnabled,
@@ -436,9 +449,10 @@ function CardItem({
             src={bookmark.favicon}
             alt=""
             draggable={false}
+            loading="lazy"
             className="mt-0.5 size-5 shrink-0 opacity-80"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = faviconFallback(20);
+              (e.target as HTMLImageElement).src = faviconFallback(20, domain);
             }}
           />
           <div className="min-w-0 flex-1">
@@ -489,7 +503,7 @@ function CardItem({
       )}
     </li>
   );
-}
+});
 
 function IconBtn({
   children,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, useEffect, Suspense, useCallback, useRef, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Bookmark, SortKey } from '@/types';
 import FilterBar from '@/components/FilterBar';
@@ -20,12 +20,19 @@ function BookmarksPageInner() {
   const searchParams = useSearchParams();
   const initialQ = searchParams.get('q') || '';
   const initialTag = searchParams.get('tag') || 'all';
+  const [isPending, startTransition] = useTransition();
   const [activeTag, setActiveTag] = useState(initialTag);
   const [searchQuery, setSearchQuery] = useState(initialQ);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQ);
   const [sort, setSort] = useState<SortKey>('newest');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const debounceTimer = useRef<NodeJS.Timeout>();
+
+  const updateSearch = useCallback((query: string) => {
+    startTransition(() => setSearchQuery(query));
+  }, []);
 
   useEffect(() => {
     const tag = searchParams.get('tag');
@@ -35,41 +42,47 @@ function BookmarksPageInner() {
   }, [searchParams]);
 
   useEffect(() => {
-    fetch('/api/bookmarks')
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (activeTag !== 'all') params.set('tag', activeTag);
+    if (debouncedQuery.trim()) params.set('q', debouncedQuery);
+    if (sort) params.set('sort', sort);
+
+    const controller = new AbortController();
+    fetch(`/api/bookmarks?${params.toString()}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load bookmarks');
         return res.json();
       })
-      .then((data: Bookmark[]) => {
-        setBookmarks(data);
-        setLoading(false);
+      .then((response: { data: Bookmark[] }) => {
+        setBookmarks(response.data || []);
+        setError(null);
       })
       .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+          setBookmarks([]);
+        }
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [activeTag, debouncedQuery, sort]);
 
   const results = useMemo(() => {
-    let filtered = bookmarks;
-    if (activeTag !== 'all') {
-      filtered = filtered.filter((b) =>
-        b.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase())
-      );
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (b) =>
-          b.title.toLowerCase().includes(q) ||
-          b.description.toLowerCase().includes(q) ||
-          b.url.toLowerCase().includes(q) ||
-          (b.notes || '').toLowerCase().includes(q) ||
-          b.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-    return sortBookmarks(filtered, sort);
-  }, [activeTag, searchQuery, bookmarks, sort]);
+    return sortBookmarks(bookmarks, sort);
+  }, [bookmarks, sort]);
 
   const isFiltered = activeTag !== 'all' || Boolean(searchQuery.trim());
   const countLabel = loading
@@ -92,7 +105,7 @@ function BookmarksPageInner() {
           <ViewToggle />
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
+            onChange={(e) => startTransition(() => setSort(e.target.value as SortKey))}
             disabled={loading}
             className="h-10 rounded-[10px] border border-border bg-bg px-3 font-mono text-xs text-fg outline-none focus-visible:border-accent disabled:opacity-50"
           >
@@ -119,7 +132,7 @@ function BookmarksPageInner() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => updateSearch(e.target.value)}
               placeholder="Search…"
               disabled={loading}
               className="h-10 w-full rounded-[10px] border border-border bg-bg pl-9 pr-3 text-sm text-fg placeholder-muted outline-none focus-visible:border-accent disabled:opacity-50"
@@ -129,7 +142,7 @@ function BookmarksPageInner() {
       </div>
 
       <div className="forge-enter space-y-6" style={{ ['--i' as string]: 1 }}>
-        <FilterBar active={activeTag} onChange={setActiveTag} />
+        <FilterBar active={activeTag} onChange={(tag) => startTransition(() => setActiveTag(tag))} />
 
         {error ? (
           <div className="border-y border-dashed border-border py-16 text-center">

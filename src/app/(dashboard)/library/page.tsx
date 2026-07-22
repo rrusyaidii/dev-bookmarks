@@ -31,15 +31,25 @@ export default function LibraryPage() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const qs = active === 'all' ? '' : `?folder=${encodeURIComponent(active)}`;
-    fetch(`/api/bookmarks${qs}`)
+    const params = new URLSearchParams();
+    if (active !== 'all') params.set('folder', active);
+    params.set('limit', '200');
+
+    const controller = new AbortController();
+    fetch(`/api/bookmarks?${params.toString()}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load bookmarks');
         return res.json();
       })
-      .then((data: Bookmark[]) => setBookmarks(data))
-      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
+      .then((response: { data: Bookmark[] }) => setBookmarks(response.data || []))
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          setError(err instanceof Error ? err.message : 'Failed to load');
+        }
+      })
       .finally(() => setLoading(false));
+
+    return () => controller.abort();
   }, [active]);
 
   const handleCreateFolder = useCallback(

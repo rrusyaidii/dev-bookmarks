@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo, useCallback } from 'react';
 import type { Tag } from '@/types';
 import { formatTagLabel } from '@/lib/tag-colors';
 
-export default function FilterBar({
+const FilterBar = memo(function FilterBar({
   active,
   onChange,
 }: {
@@ -15,11 +15,14 @@ export default function FilterBar({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/tags')
+    const controller = new AbortController();
+    fetch('/api/tags', { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : []))
       .then((data: Tag[]) => setTags(data))
       .catch(() => setTags([]))
       .finally(() => setLoading(false));
+
+    return () => controller.abort();
   }, []);
 
   return (
@@ -51,9 +54,11 @@ export default function FilterBar({
       </div>
     </div>
   );
-}
+});
 
-function FilterTab({
+export default FilterBar;
+
+const FilterTab = memo(function FilterTab({
   label,
   count,
   active,
@@ -97,4 +102,4 @@ function FilterTab({
       )}
     </button>
   );
-}
+});

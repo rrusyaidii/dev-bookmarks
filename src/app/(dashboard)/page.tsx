@@ -4,7 +4,7 @@ import StatsCards from '@/components/StatsCards';
 import RecentBookmarks from '@/components/RecentBookmarks';
 import QuickAddButton from '@/components/QuickAddButton';
 import { Bookmark } from '@/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { formatTagLabel } from '@/lib/tag-colors';
 
 export default function DashboardPage() {
@@ -13,19 +13,24 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/bookmarks')
+    const controller = new AbortController();
+    fetch('/api/bookmarks?limit=100', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load bookmarks');
         return res.json();
       })
-      .then((data: Bookmark[]) => {
-        setBookmarks(data);
+      .then((response: { data: Bookmark[] }) => {
+        setBookmarks(response.data || []);
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
-        setLoading(false);
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+          setLoading(false);
+        }
       });
+
+    return () => controller.abort();
   }, []);
 
   if (loading) {
@@ -61,27 +66,31 @@ export default function DashboardPage() {
     );
   }
 
-  const now = new Date();
-  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const newestFirst = [...bookmarks].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
-  const thisWeek = newestFirst.filter((b) => new Date(b.createdAt) >= oneWeekAgo);
-  const savedThisWeek = thisWeek.length;
-  const recentBookmarks = (thisWeek.length > 0 ? thisWeek : newestFirst).slice(0, 6);
-  const recentSubtitle =
-    thisWeek.length > 0 ? 'Last 7 days' : bookmarks.length > 0 ? 'Latest saves' : 'Last 7 days';
+  const stats = useMemo(() => {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const newestFirst = [...bookmarks].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    const thisWeek = newestFirst.filter((b) => new Date(b.createdAt) >= oneWeekAgo);
+    const savedThisWeek = thisWeek.length;
+    const recentBookmarks = (thisWeek.length > 0 ? thisWeek : newestFirst).slice(0, 6);
+    const recentSubtitle =
+      thisWeek.length > 0 ? 'Last 7 days' : bookmarks.length > 0 ? 'Latest saves' : 'Last 7 days';
 
-  const tagCounts = bookmarks.flatMap((b) => b.tags).reduce<Record<string, number>>(
-    (acc, tag) => {
-      acc[tag] = (acc[tag] || 0) + 1;
-      return acc;
-    },
-    {}
-  );
-  const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-  const mostUsedTag = topTag ? formatTagLabel(topTag) : '—';
-  const favorites = bookmarks.filter((b) => b.isFavorite).length;
+    const tagCounts = bookmarks.flatMap((b) => b.tags).reduce<Record<string, number>>(
+      (acc, tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+        return acc;
+      },
+      {}
+    );
+    const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const mostUsedTag = topTag ? formatTagLabel(topTag) : '—';
+    const favorites = bookmarks.filter((b) => b.isFavorite).length;
+
+    return { savedThisWeek, recentBookmarks, recentSubtitle, mostUsedTag, favorites };
+  }, [bookmarks]);
 
   return (
     <div className="mx-auto max-w-4xl space-y-10">
@@ -95,13 +104,13 @@ export default function DashboardPage() {
       <StatsCards
         stats={{
           total: bookmarks.length,
-          savedThisWeek,
-          mostUsedTag,
-          favorites,
+          savedThisWeek: stats.savedThisWeek,
+          mostUsedTag: stats.mostUsedTag,
+          favorites: stats.favorites,
         }}
       />
       <div className="forge-enter" style={{ ['--i' as string]: 2 }}>
-        <RecentBookmarks bookmarks={recentBookmarks} subtitle={recentSubtitle} />
+        <RecentBookmarks bookmarks={stats.recentBookmarks} subtitle={stats.recentSubtitle} />
       </div>
       <QuickAddButton />
     </div>
