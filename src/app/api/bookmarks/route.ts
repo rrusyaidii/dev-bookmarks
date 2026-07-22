@@ -24,81 +24,30 @@ export async function GET(request: NextRequest) {
     if (!user) return unauthorizedJson(origin);
 
     const { searchParams } = new URL(request.url);
-    const q = searchParams.get('q');
-    const tag = searchParams.get('tag');
     const folder = searchParams.get('folder');
     const sortParam = searchParams.get('sort') as SortKey | null;
     const sort: SortKey =
       sortParam && SORT_KEYS.includes(sortParam) ? sortParam : 'newest';
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-    const limit = Math.min(100, parseInt(searchParams.get('limit') || '50'));
-    const skip = (page - 1) * limit;
 
-    const where: any = {
-      userId: user.id,
-      ...(folder === 'unfiled'
-        ? { folders: { none: {} } }
-        : folder
-          ? { folders: { some: { id: folder } } }
-          : {}),
-    };
+    const bookmarks = await prisma.bookmark.findMany({
+      where: {
+        userId: user.id,
+        ...(folder === 'unfiled'
+          ? { folders: { none: {} } }
+          : folder
+            ? { folders: { some: { id: folder } } }
+            : {}),
+      },
+      include: { folders: true },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    if (tag) {
-      where.tags = {
-        contains: tag,
-      };
-    }
+    let filtered = bookmarks.map(serializeBookmark);
 
-    if (q) {
-      const query = q.toLowerCase();
-      where.OR = [
-        { title: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
-        { url: { contains: query, mode: 'insensitive' } },
-        { notes: { contains: query, mode: 'insensitive' } },
-        { tags: { contains: query } },
-      ];
-    }
-
-    const orderBy: any = {};
-    switch (sort) {
-      case 'oldest':
-        orderBy.createdAt = 'asc';
-        break;
-      case 'az':
-        orderBy.title = 'asc';
-        break;
-      case 'tagCount':
-        orderBy.tags = 'desc';
-        break;
-      case 'favorites':
-        orderBy.isFavorite = 'desc';
-        break;
-      default:
-        orderBy.createdAt = 'desc';
-    }
-
-    const [bookmarks, total] = await Promise.all([
-      prisma.bookmark.findMany({
-        where,
-        include: { folders: true },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      prisma.bookmark.count({ where }),
-    ]);
-
-    const serialized = bookmarks.map(serializeBookmark);
+    filtered = sortBookmarks(filtered, sort);
 
     const response = NextResponse.json({
-      data: serialized,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      data: filtered,
     });
     response.headers.set('Cache-Control', 'private, max-age=30');
     return withCors(response, origin);
