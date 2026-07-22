@@ -106,7 +106,7 @@ function BookmarksPageInner() {
   const countLabel = loading
     ? 'Loading…'
     : isFiltered
-      ? `${results.length} of ${bookmarks.length}`
+      ? `${totalCount} found`
       : `${bookmarks.length} collected`;
 
   return (
@@ -122,6 +122,7 @@ function BookmarksPageInner() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <ViewToggle />
           <select
+            id="sort-select"
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             disabled={loading}
@@ -148,6 +149,7 @@ function BookmarksPageInner() {
               <path d="m21 21-4.35-4.35" />
             </svg>
             <input
+              id="search-input"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
