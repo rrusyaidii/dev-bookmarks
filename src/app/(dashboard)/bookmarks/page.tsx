@@ -55,8 +55,6 @@ function BookmarksPageInner() {
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (activeTag !== 'all') params.set('tag', activeTag);
-    if (debouncedQuery.trim()) params.set('q', debouncedQuery);
     if (sort) params.set('sort', sort);
 
     const controller = new AbortController();
@@ -65,8 +63,9 @@ function BookmarksPageInner() {
         if (!res.ok) throw new Error('Failed to load bookmarks');
         return res.json();
       })
-      .then((response: { data: Bookmark[] }) => {
-        setBookmarks(response.data || []);
+      .then((response: { data: Bookmark[] } | Bookmark[]) => {
+        const data = Array.isArray(response) ? response : response.data || [];
+        setBookmarks(data);
         setError(null);
       })
       .catch((err) => {
@@ -78,11 +77,28 @@ function BookmarksPageInner() {
       .finally(() => setLoading(false));
 
     return () => controller.abort();
-  }, [activeTag, debouncedQuery, sort]);
+  }, [sort]);
 
   const results = useMemo(() => {
-    return sortBookmarks(bookmarks, sort);
-  }, [bookmarks, sort]);
+    let filtered = bookmarks;
+    if (activeTag !== 'all') {
+      filtered = filtered.filter((b) =>
+        b.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase())
+      );
+    }
+    if (debouncedQuery.trim()) {
+      const q = debouncedQuery.toLowerCase();
+      filtered = filtered.filter(
+        (b) =>
+          b.title.toLowerCase().includes(q) ||
+          b.description.toLowerCase().includes(q) ||
+          b.url.toLowerCase().includes(q) ||
+          (b.notes || '').toLowerCase().includes(q) ||
+          b.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    return sortBookmarks(filtered, sort);
+  }, [activeTag, debouncedQuery, bookmarks, sort]);
 
   const isFiltered = activeTag !== 'all' || Boolean(searchQuery.trim());
   const countLabel = loading

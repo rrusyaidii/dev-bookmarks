@@ -14,13 +14,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch('/api/bookmarks?limit=100', { signal: controller.signal })
+    fetch('/api/bookmarks', { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load bookmarks');
         return res.json();
       })
-      .then((response: { data: Bookmark[] }) => {
-        setBookmarks(response.data || []);
+      .then((response: { data: Bookmark[] } | Bookmark[]) => {
+        const data = Array.isArray(response) ? response : response.data || [];
+        setBookmarks(data);
         setLoading(false);
       })
       .catch((err) => {

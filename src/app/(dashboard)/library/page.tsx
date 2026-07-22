@@ -33,7 +33,6 @@ export default function LibraryPage() {
     setError(null);
     const params = new URLSearchParams();
     if (active !== 'all') params.set('folder', active);
-    params.set('limit', '200');
 
     const controller = new AbortController();
     fetch(`/api/bookmarks?${params.toString()}`, { signal: controller.signal })
@@ -41,7 +40,10 @@ export default function LibraryPage() {
         if (!res.ok) throw new Error('Failed to load bookmarks');
         return res.json();
       })
-      .then((response: { data: Bookmark[] }) => setBookmarks(response.data || []))
+      .then((response: { data: Bookmark[] } | Bookmark[]) => {
+        const data = Array.isArray(response) ? response : response.data || [];
+        setBookmarks(data);
+      })
       .catch((err) => {
         if (err.name !== 'AbortError') {
           setError(err instanceof Error ? err.message : 'Failed to load');
