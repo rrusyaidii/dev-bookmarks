@@ -34,6 +34,32 @@ export default function DashboardPage() {
     return () => controller.abort();
   }, []);
 
+  const stats = useMemo(() => {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const newestFirst = [...bookmarks].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    const thisWeek = newestFirst.filter((b) => new Date(b.createdAt) >= oneWeekAgo);
+    const savedThisWeek = thisWeek.length;
+    const recentBookmarks = (thisWeek.length > 0 ? thisWeek : newestFirst).slice(0, 6);
+    const recentSubtitle =
+      thisWeek.length > 0 ? 'Last 7 days' : bookmarks.length > 0 ? 'Latest saves' : 'Last 7 days';
+
+    const tagCounts = bookmarks.flatMap((b) => b.tags).reduce<Record<string, number>>(
+      (acc, tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+        return acc;
+      },
+      {}
+    );
+    const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const mostUsedTag = topTag ? formatTagLabel(topTag) : '—';
+    const favorites = bookmarks.filter((b) => b.isFavorite).length;
+
+    return { savedThisWeek, recentBookmarks, recentSubtitle, mostUsedTag, favorites };
+  }, [bookmarks]);
+
   if (loading) {
     return (
       <div className="mx-auto max-w-4xl space-y-10">
@@ -66,32 +92,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  const stats = useMemo(() => {
-    const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const newestFirst = [...bookmarks].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    const thisWeek = newestFirst.filter((b) => new Date(b.createdAt) >= oneWeekAgo);
-    const savedThisWeek = thisWeek.length;
-    const recentBookmarks = (thisWeek.length > 0 ? thisWeek : newestFirst).slice(0, 6);
-    const recentSubtitle =
-      thisWeek.length > 0 ? 'Last 7 days' : bookmarks.length > 0 ? 'Latest saves' : 'Last 7 days';
-
-    const tagCounts = bookmarks.flatMap((b) => b.tags).reduce<Record<string, number>>(
-      (acc, tag) => {
-        acc[tag] = (acc[tag] || 0) + 1;
-        return acc;
-      },
-      {}
-    );
-    const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-    const mostUsedTag = topTag ? formatTagLabel(topTag) : '—';
-    const favorites = bookmarks.filter((b) => b.isFavorite).length;
-
-    return { savedThisWeek, recentBookmarks, recentSubtitle, mostUsedTag, favorites };
-  }, [bookmarks]);
 
   return (
     <div className="mx-auto max-w-4xl space-y-10">
