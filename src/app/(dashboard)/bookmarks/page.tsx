@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense, useCallback, useRef, useTransition } from 'react';
+import { useState, useMemo, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Bookmark, SortKey } from '@/types';
 import FilterBar from '@/components/FilterBar';
@@ -20,7 +20,6 @@ function BookmarksPageInner() {
   const searchParams = useSearchParams();
   const initialQ = searchParams.get('q') || '';
   const initialTag = searchParams.get('tag') || 'all';
-  const [isPending, startTransition] = useTransition();
   const [activeTag, setActiveTag] = useState(initialTag);
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQ);
@@ -29,10 +28,6 @@ function BookmarksPageInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
-
-  const updateSearch = useCallback((query: string) => {
-    startTransition(() => setSearchQuery(query));
-  }, []);
 
   useEffect(() => {
     const tag = searchParams.get('tag');
@@ -121,7 +116,7 @@ function BookmarksPageInner() {
           <ViewToggle />
           <select
             value={sort}
-            onChange={(e) => startTransition(() => setSort(e.target.value as SortKey))}
+            onChange={(e) => setSort(e.target.value as SortKey)}
             disabled={loading}
             className="h-10 rounded-[10px] border border-border bg-bg px-3 font-mono text-xs text-fg outline-none focus-visible:border-accent disabled:opacity-50"
           >
@@ -148,7 +143,7 @@ function BookmarksPageInner() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => updateSearch(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search…"
               disabled={loading}
               className="h-10 w-full rounded-[10px] border border-border bg-bg pl-9 pr-3 text-sm text-fg placeholder-muted outline-none focus-visible:border-accent disabled:opacity-50"
@@ -158,7 +153,7 @@ function BookmarksPageInner() {
       </div>
 
       <div className="forge-enter space-y-6" style={{ ['--i' as string]: 1 }}>
-        <FilterBar active={activeTag} onChange={(tag) => startTransition(() => setActiveTag(tag))} />
+        <FilterBar active={activeTag} onChange={setActiveTag} />
 
         {error ? (
           <div className="border-y border-dashed border-border py-16 text-center">
